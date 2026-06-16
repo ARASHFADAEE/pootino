@@ -13,6 +13,7 @@ class DatabaseSeeder extends Seeder
             EducationLevelSeeder::class,
             MilitaryOrganizationSeeder::class,
             ProvinceAndCitySeeder::class,
+            DemoAdsSeeder::class,
         ]);
     }
 }

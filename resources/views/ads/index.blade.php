@@ -4,11 +4,17 @@
 
 @section('content')
 <section class="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8" x-data="{ filtersOpen: false }">
-    <div class="mb-6 rounded-2xl bg-gradient-to-l from-[var(--color-military-700)] to-[var(--color-military-900)] p-5 text-white sm:p-7">
+    <div class="mb-6 rounded-2xl bg-gradient-to-l from-[var(--color-primary-700)] to-[var(--color-primary-900)] p-5 text-white sm:p-7">
         <h1 class="text-xl font-extrabold sm:text-2xl">تبادل محل خدمت، ساده و سریع</h1>
         <p class="mt-2 text-sm text-slate-100">{{ $totalActive }} آگهی فعال از سراسر کشور</p>
-        <form class="mt-4" method="GET">
-            <input name="search" value="{{ $filters['search'] ?? '' }}" class="w-full rounded-xl border-0 bg-white px-4 py-3 text-sm text-slate-800" placeholder="جستجو بر اساس عنوان یا توضیحات" />
+        <form class="mt-4" method="GET" x-data="{ t: null }">
+            <input
+                name="search"
+                value="{{ $filters['search'] ?? '' }}"
+                class="w-full rounded-xl border-0 bg-white px-4 py-3 text-sm text-slate-800"
+                placeholder="جستجو بر اساس عنوان یا توضیحات"
+                @input="clearTimeout(t); t = setTimeout(() => $el.form.submit(), 350)"
+            />
         </form>
     </div>
 

@@ -6,6 +6,7 @@ use App\Http\Requests\StoreAdRequest;
 use App\Http\Requests\UpdateAdRequest;
 use App\Jobs\SendAdToTelegramJob;
 use App\Models\Ad;
+use App\Models\City;
 use App\Models\EducationLevel;
 use App\Models\MilitaryOrganization;
 use App\Models\Province;
@@ -53,11 +54,13 @@ class AdController extends Controller
 
         try {
             $provinces = Province::query()->get();
+            $cities = City::query()->orderBy('name')->get();
             $organizations = MilitaryOrganization::with('branches')->get();
             $ranks = Rank::query()->get();
             $educationLevels = EducationLevel::query()->get();
         } catch (QueryException) {
             $provinces = collect();
+            $cities = collect();
             $organizations = collect();
             $ranks = collect();
             $educationLevels = collect();
@@ -67,6 +70,7 @@ class AdController extends Controller
             'ads' => $ads,
             'filters' => $filters,
             'provinces' => $provinces,
+            'cities' => $cities,
             'organizations' => $organizations,
             'ranks' => $ranks,
             'educationLevels' => $educationLevels,
@@ -155,6 +159,7 @@ class AdController extends Controller
     {
         return [
             'provinces' => Province::orderBy('name')->get(),
+            'cities' => City::orderBy('name')->get(),
             'organizations' => MilitaryOrganization::with('branches')->get(),
             'ranks' => Rank::orderBy('order')->get(),
             'educationLevels' => EducationLevel::orderBy('order')->get(),

@@ -8,54 +8,65 @@
 
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
-            <label class="mb-1 block text-sm">عنوان آگهی</label>
-            <input class="w-full rounded-xl border-slate-300" name="title" value="{{ old('title', $ad->title ?? '') }}" />
+            <label class="mb-1 block text-sm font-semibold text-slate-700">عنوان آگهی</label>
+            <input class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[var(--color-primary-700)] focus:ring-[var(--color-primary-700)]" name="title" value="{{ old('title', $ad->title ?? '') }}" placeholder="مثال: تبادل محل خدمت تهران به شیراز" />
         </div>
         <div>
-            <label class="mb-1 block text-sm">شماره تماس</label>
-            <input class="w-full rounded-xl border-slate-300" dir="ltr" name="phone" value="{{ old('phone', $ad->phone ?? auth()->user()->phone) }}" />
+            <label class="mb-1 block text-sm font-semibold text-slate-700">شماره تماس</label>
+            <input class="w-full rounded-xl border border-slate-200 bg-slate-100 px-4 py-3 text-center text-sm text-slate-700" dir="ltr" name="phone" value="{{ old('phone', $ad->phone ?? auth()->user()->phone) }}" readonly />
+            <p class="mt-1 text-xs text-slate-500">شماره تماس از حساب کاربری خوانده می‌شود و قابل تغییر نیست.</p>
         </div>
         <div>
-            <label class="mb-1 block text-sm">استان فعلی</label>
-            <select class="w-full rounded-xl border-slate-300" name="current_province_id">
+            <label class="mb-1 block text-sm font-semibold text-slate-700">استان فعلی</label>
+            <select data-searchable class="w-full rounded-xl border-slate-300" name="current_province_id" data-province-select="current">
                 @foreach($provinces as $p)<option value="{{ $p->id }}" @selected(old('current_province_id', $ad->current_province_id ?? '') == $p->id)>{{ $p->name }}</option>@endforeach
             </select>
         </div>
         <div>
-            <label class="mb-1 block text-sm">شهر فعلی (شناسه)</label>
-            <input class="w-full rounded-xl border-slate-300" name="current_city_id" value="{{ old('current_city_id', $ad->current_city_id ?? '') }}" />
+            <label class="mb-1 block text-sm font-semibold text-slate-700">شهر فعلی</label>
+            <select data-searchable class="w-full rounded-xl border-slate-300" name="current_city_id" data-city-select="current">
+                @foreach($cities as $city)<option data-province-id="{{ $city->province_id }}" value="{{ $city->id }}" @selected(old('current_city_id', $ad->current_city_id ?? '') == $city->id)>{{ $city->name }}</option>@endforeach
+            </select>
         </div>
         <div>
-            <label class="mb-1 block text-sm">استان مقصد</label>
-            <select class="w-full rounded-xl border-slate-300" name="desired_province_id">
+            <label class="mb-1 block text-sm font-semibold text-slate-700">استان مقصد</label>
+            <select data-searchable class="w-full rounded-xl border-slate-300" name="desired_province_id" data-province-select="desired">
                 @foreach($provinces as $p)<option value="{{ $p->id }}" @selected(old('desired_province_id', $ad->desired_province_id ?? '') == $p->id)>{{ $p->name }}</option>@endforeach
             </select>
         </div>
         <div>
-            <label class="mb-1 block text-sm">شهر مقصد (شناسه)</label>
-            <input class="w-full rounded-xl border-slate-300" name="desired_city_id" value="{{ old('desired_city_id', $ad->desired_city_id ?? '') }}" />
+            <label class="mb-1 block text-sm font-semibold text-slate-700">شهر مقصد</label>
+            <select data-searchable class="w-full rounded-xl border-slate-300" name="desired_city_id" data-city-select="desired">
+                @foreach($cities as $city)<option data-province-id="{{ $city->province_id }}" value="{{ $city->id }}" @selected(old('desired_city_id', $ad->desired_city_id ?? '') == $city->id)>{{ $city->name }}</option>@endforeach
+            </select>
         </div>
         <div>
-            <label class="mb-1 block text-sm">شاخه نیرو (شناسه)</label>
-            <input class="w-full rounded-xl border-slate-300" name="current_branch_id" value="{{ old('current_branch_id', $ad->current_branch_id ?? '') }}" />
+            <label class="mb-1 block text-sm font-semibold text-slate-700">شاخه نیرو</label>
+            <select data-searchable class="w-full rounded-xl border-slate-300" name="current_branch_id">
+                @foreach($organizations as $organization)
+                    @foreach($organization->branches as $branch)
+                        <option value="{{ $branch->id }}" @selected(old('current_branch_id', $ad->current_branch_id ?? '') == $branch->id)>{{ $organization->name }} - {{ $branch->name }}</option>
+                    @endforeach
+                @endforeach
+            </select>
         </div>
         <div>
-            <label class="mb-1 block text-sm">درجه</label>
-            <select class="w-full rounded-xl border-slate-300" name="rank_id">
+            <label class="mb-1 block text-sm font-semibold text-slate-700">درجه</label>
+            <select data-searchable class="w-full rounded-xl border-slate-300" name="rank_id">
                 @foreach($ranks as $rank)<option value="{{ $rank->id }}" @selected(old('rank_id', $ad->rank_id ?? '') == $rank->id)>{{ $rank->name }}</option>@endforeach
             </select>
         </div>
         <div class="sm:col-span-2">
-            <label class="mb-1 block text-sm">تحصیلات</label>
-            <select class="w-full rounded-xl border-slate-300" name="education_level_id">
+            <label class="mb-1 block text-sm font-semibold text-slate-700">تحصیلات</label>
+            <select data-searchable class="w-full rounded-xl border-slate-300" name="education_level_id">
                 @foreach($educationLevels as $level)<option value="{{ $level->id }}" @selected(old('education_level_id', $ad->education_level_id ?? '') == $level->id)>{{ $level->name }}</option>@endforeach
             </select>
         </div>
         <div class="sm:col-span-2">
-            <label class="mb-1 block text-sm">توضیحات</label>
-            <textarea class="w-full rounded-xl border-slate-300" name="description" rows="4">{{ old('description', $ad->description ?? '') }}</textarea>
+            <label class="mb-1 block text-sm font-semibold text-slate-700">توضیحات</label>
+            <textarea class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[var(--color-primary-700)] focus:ring-[var(--color-primary-700)]" name="description" rows="4" placeholder="توضیح کوتاه درباره شرایط تبادل...">{{ old('description', $ad->description ?? '') }}</textarea>
         </div>
     </div>
 
-    <button class="w-full rounded-xl bg-[var(--color-military-700)] py-3 text-sm font-semibold text-white">{{ $editing ? 'ذخیره تغییرات' : 'ثبت آگهی' }}</button>
+    <button class="w-full rounded-xl bg-[var(--color-primary-700)] py-3 text-sm font-semibold text-white">{{ $editing ? 'ذخیره تغییرات' : 'ثبت آگهی' }}</button>
 </form>

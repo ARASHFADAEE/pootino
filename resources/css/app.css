@@ -1,18 +1,36 @@
 @import 'tailwindcss';
+@import 'tom-select/dist/css/tom-select.css';
+
+@font-face {
+  font-family: 'IRANYekanXVF';
+  src: url('/iranuekanxpro/IRANYekanXVF.woff2') format('woff2'),
+       url('/iranuekanxpro/IRANYekanXVF.woff') format('woff-variations'),
+       url('/iranuekanxpro/IRANYekanXVF.woff') format('woff');
+  font-weight: 100 1000;
+  font-display: fallback;
+}
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 
 @theme {
-  --font-sans: 'Vazirmatn', Tahoma, ui-sans-serif, system-ui, sans-serif;
-  --color-military-900: #1f2f1b;
-  --color-military-700: #2f4a28;
-  --color-military-600: #3f6035;
-  --color-cream-50: #fcfaf7;
-  --color-cream-100: #f7f2ea;
+  --font-sans: 'IRANYekanXVF', Tahoma, ui-sans-serif, system-ui, sans-serif;
+  --color-primary-900: #3f4935;
+  --color-primary-700: #6b745a;
+  --color-primary-500: #8c9070;
+  --color-accent-200: #d9cfbf;
+  --color-accent-100: #eee7dc;
+  --color-bg-soft: #f7f2eb;
 }
 
 body {
   direction: rtl;
-  background: var(--color-cream-50);
+  background: var(--color-bg-soft);
+}
+
+.ts-wrapper.single .ts-control,
+.ts-wrapper.multi .ts-control {
+  border-radius: 0.75rem;
+  min-height: 2.75rem;
+  border-color: #cbd5e1;
 }
