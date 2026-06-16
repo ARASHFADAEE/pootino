@@ -2,19 +2,23 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Attributes\Description;
-use Illuminate\Console\Attributes\Signature;
+use App\Models\Ad;
 use Illuminate\Console\Command;
 
-#[Signature('app:expire-ads')]
-#[Description('Command description')]
 class ExpireAds extends Command
 {
-    /**
-     * Execute the console command.
-     */
-    public function handle()
+    protected $signature = 'ads:expire';
+
+    protected $description = 'غیرفعال کردن آگهی‌های منقضی‌شده';
+
+    public function handle(): int
     {
-        //
+        $count = Ad::where('status', 'approved')
+            ->whereNotNull('expires_at')
+            ->where('expires_at', '<', now())
+            ->update(['is_active' => false]);
+
+        $this->info("{$count} آگهی منقضی شد.");
+        return self::SUCCESS;
     }
 }

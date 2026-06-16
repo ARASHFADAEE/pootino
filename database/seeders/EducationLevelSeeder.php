@@ -2,16 +2,15 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\EducationLevel;
 use Illuminate\Database\Seeder;
 
 class EducationLevelSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        //
+        foreach ([['name' => 'دیپلم', 'order' => 1], ['name' => 'کارشناسی', 'order' => 2], ['name' => 'کارشناسی ارشد', 'order' => 3]] as $level) {
+            EducationLevel::create($level);
+        }
     }
 }
