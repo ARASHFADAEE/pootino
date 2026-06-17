@@ -106,6 +106,12 @@
         </div>
     @endif
 
+    @if(session('error'))
+        <div class="mx-auto mt-4 w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div class="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">{{ session('error') }}</div>
+        </div>
+    @endif
+
     <main>@yield('content')</main>
 </div>
 </body>

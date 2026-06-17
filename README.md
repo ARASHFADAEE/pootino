@@ -1881,3 +1881,255 @@ Schedule::command('ads:expire')->dailyAt('00:00');
 - آدرس webhook ثبت: `https://api.telegram.org/bot{TOKEN}/setWebhook?url=https://yourdomain.com/telegram/webhook/{SECRET}`
 - برای production حتماً `php artisan config:cache && php artisan route:cache` اجرا کن
 ```
+
+---
+
+## ۱۷. معماری پروژه (وضعیت فعلی)
+
+پوتینو یک اپلیکیشن **تک‌صفحه‌ای (SPA-like listing)** با بک‌اند Laravel است که آگهی‌های تبادل محل خدمت سربازی را مدیریت می‌کند. فرانت‌اند Blade + Alpine.js + Tailwind CSS v4 است و بدون Livewire پیاده‌سازی شده.
+
+### نمای کلی لایه‌ها
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  Browser (RTL, فارسی)                                       │
+│  Blade Views + Alpine.js + Tom Select                       │
+└──────────────────────────┬──────────────────────────────────┘
+                           │
+┌──────────────────────────▼──────────────────────────────────┐
+│  routes/web.php                                             │
+│  ├── AdController        (عمومی + auth)                     │
+│  ├── OtpController       (احراز هویت OTP)                     │
+│  ├── AdminController     (پنل ادمین سبک)                      │
+│  └── TelegramWebhookController                              │
+└──────────────────────────┬──────────────────────────────────┘
+                           │
+┌──────────────────────────▼──────────────────────────────────┐
+│  Services                                                   │
+│  ├── SmsIrService          ارسال OTP                        │
+│  └── ShahkarKycService     احراز کد ملی ↔ موبایل (Finnotech) │
+└──────────────────────────┬──────────────────────────────────┘
+                           │
+┌──────────────────────────▼──────────────────────────────────┐
+│  Models + MySQL/SQLite                                      │
+│  User, Ad, Otp, Province, City, Rank, ...                   │
+└──────────────────────────┬──────────────────────────────────┘
+                           │
+┌──────────────────────────▼──────────────────────────────────┐
+│  Queue Jobs                                                 │
+│  SendAdToTelegramJob  →  اطلاع‌رسانی آگهی جدید به تلگرام      │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### ساختار پوشه‌های کلیدی
+
+```
+app/
+├── Http/
+│   ├── Controllers/
+│   │   ├── AdController.php
+│   │   ├── Auth/OtpController.php
+│   │   ├── Admin/AdminController.php
+│   │   └── TelegramWebhookController.php
+│   ├── Middleware/AdminAccess.php
+│   └── Requests/StoreAdRequest.php, UpdateAdRequest.php
+├── Models/          User, Ad, Otp, Province, City, ...
+├── Services/        SmsIrService, ShahkarKycService
+└── Jobs/            SendAdToTelegramJob
+
+resources/
+├── views/
+│   ├── layouts/     app.blade.php, auth.blade.php
+│   ├── ads/         index, show, create, form, my-ads
+│   ├── auth/        phone, verify, complete-profile
+│   ├── admin/       index
+│   └── components/  ad-card, empty-state
+├── css/app.css      Tailwind v4 + IRANYekanXVF
+└── js/app.js        Alpine + Tom Select
+
+public/
+├── img/
+│   ├── Untitled.png       لوگوی هدر و فرم‌های ورود
+│   └── logo-pootino.png   favicon
+└── iranuekanxpro/         فونت IRANYekanXVF
+```
+
+### جریان احراز هویت (دو مرحله‌ای)
+
+احراز هویت به‌صورت **Phone-first** پیاده‌سازی شده؛ نام و کد ملی در ابتدا گرفته نمی‌شود.
+
+```
+کاربر مهمان
+    │
+    ▼
+/auth/phone  ──►  فقط شماره موبایل
+    │
+    ▼
+sendOtp  ──►  تولید OTP + (SMS در production)
+    │
+    ▼
+/auth/verify  ──►  وارد کردن کد ۶ رقمی
+    │
+    ├── کاربر موجود با national_code  ──►  لاگین ──►  صفحه اصلی
+    │
+    └── کاربر جدید / بدون کد ملی
+              │
+              ▼
+        /auth/complete-profile
+              │
+              ├── نام و نام خانوادگی
+              ├── کد ملی
+              └── Shahkar KYC (در local بای‌پس)
+              │
+              ▼
+        ذخیره پروفایل ──►  صفحه اصلی
+```
+
+**فایل‌های مرتبط:** `OtpController`, `auth/phone.blade.php`, `auth/verify.blade.php`, `auth/complete-profile.blade.php`
+
+### جریان آگهی
+
+| مرحله | مسیر | توضیح |
+|--------|------|--------|
+| لیست | `GET /` | فیلتر + جستجوی لایو |
+| جزئیات | `GET /ads/{ad}` | فقط آگهی‌های `approved` و `is_active` |
+| ثبت | `GET /ads/create` | نیاز به `auth` — **قبل از** روت `ads/{ad}` تعریف شده |
+| ویرایش | `GET /ads/{ad}/edit` | فقط مالک آگهی |
+| آگهی‌های من | `GET /my-ads` | لیست آگهی‌های کاربر |
+
+**وضعیت آگهی:** `pending` → (تایید ادمین) → `approved` | `rejected`
+
+### پنل ادمین (سبک، بدون Filament)
+
+پنل ادمین فعلاً یک **CRUD سبک تایید/رد** است، نه Filament:
+
+- مسیر: `/admin`
+- میدلور: `auth` + `admin` (`AdminAccess`)
+- دسترسی: شماره موبایل کاربر باید در `ADMIN_PHONES` (env) باشد
+- عملیات: لیست آگهی‌ها، فیلتر وضعیت، تایید، رد (با `admin_note`)
+
+```env
+ADMIN_PHONES=09123456789,09111111111
+```
+
+---
+
+## ۱۸. تغییرات پیاده‌سازی‌شده (Changelog)
+
+### احراز هویت
+
+- [x] ورود دو مرحله‌ای: ابتدا موبایل + OTP، سپس تکمیل پروفایل برای کاربر جدید
+- [x] در `APP_ENV=local`: بای‌پس Shahkar و SMS؛ نمایش کد OTP روی صفحه verify برای تست
+- [x] OTP در سشن با کلید `otp_preview_code` (فقط local)
+
+### UI / UX
+
+- [x] **هدر:** لوگو (`Untitled.png`)، منوی دسکتاپ و همبرگری **فقط برای کاربر لاگین**
+- [x] **منوی موبایل:** آگهی‌ها، آگهی‌های من، ثبت آگهی، پنل ادمین (در صورت مجوز)، خروج
+- [x] **دکمه خروج** در دسکتاپ با استایل واضح (border قرمز)
+- [x] **فاوآیکون** از `public/img/logo-pootino.png`
+- [x] **فونت:** IRANYekanXVF (حذف Vazirmatn و CDN bunny)
+- [x] **صفحه آگهی:** نمایش شماره تماس با دکمه «کپی شماره» (Alpine + clipboard API)
+- [x] **هشدار ورود:** باکس وسط‌چین با استایل amber برای مهمان‌ها
+- [x] **کارت آگهی:** کل کارت قابل کلیک (لینک overlay) + دکمه مشاهده
+- [x] **جستجو:** لایو با debounce ۳۵۰ms روی صفحه اصلی (بدون نیاز به Enter)
+- [x] **فرم ثبت آگهی:** شماره تماس readonly از حساب کاربر؛ استایل واضح input/textarea
+
+### SEO
+
+متا‌تگ‌های فنی در `layouts/app.blade.php`:
+
+- `description`, `robots`, `canonical`
+- Open Graph (`og:title`, `og:description`, `og:image`, ...)
+- Twitter Card
+- قابل override با `@section('meta_description')` در هر صفحه
+
+### باگ‌فیکس‌ها
+
+- [x] **404 ثبت آگهی:** روت `ads/create` قبل از `ads/{ad}` قرار گرفت تا Laravel کلمه `create` را به‌عنوان `{ad}` تفسیر نکند
+- [x] **Blade syntax:** بستن صحیح `@auth/@endauth` در layout
+
+### پیکربندی محیط توسعه (local)
+
+```env
+APP_ENV=local
+
+# برای جلوگیری از خطای Connection refused روی sessions:
+SESSION_DRIVER=file
+CACHE_STORE=file
+QUEUE_CONNECTION=sync
+
+# یا MySQL را روشن نگه دار و migrate کن
+```
+
+> **نکته:** اگر `SESSION_DRIVER=database` باشد و MySQL در دسترس نباشد، هر درخواست (از جمله جستجوی لایو) با خطای `Connection refused` روی جدول `sessions` شکست می‌خورد.
+
+---
+
+## ۱۹. متغیرهای محیطی (به‌روز)
+
+```env
+APP_NAME=پوتینو
+APP_ENV=local
+APP_URL=http://127.0.0.1:8000
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=8889
+DB_DATABASE=pootino
+DB_USERNAME=root
+DB_PASSWORD=root
+
+SESSION_DRIVER=file
+CACHE_STORE=file
+QUEUE_CONNECTION=database
+
+SMSIR_API_KEY=
+SMSIR_TEMPLATE_ID=
+
+TELEGRAM_BOT_TOKEN=
+TELEGRAM_ADMIN_CHAT_ID=
+TELEGRAM_WEBHOOK_SECRET=
+
+ADMIN_PHONES=09123456789
+
+FINNOTECH_ADDRESS=https://sandboxapi.finnotech.ir
+FINNOTECH_CLIENT_ID=
+FINNOTECH_TOKEN=
+```
+
+---
+
+## ۲۰. روت‌های فعلی (`routes/web.php`)
+
+| Method | URI | Name | Middleware |
+|--------|-----|------|------------|
+| GET | `/` | `ads.index` | — |
+| GET | `/ads/{ad}` | `ads.show` | — |
+| GET | `/ads/create` | `ads.create` | auth |
+| POST | `/ads` | `ads.store` | auth |
+| GET | `/ads/{ad}/edit` | `ads.edit` | auth |
+| PUT | `/ads/{ad}` | `ads.update` | auth |
+| DELETE | `/ads/{ad}` | `ads.destroy` | auth |
+| GET | `/my-ads` | `ads.my` | auth |
+| GET | `/auth/phone` | `auth.otp.phone` | — |
+| POST | `/auth/send-otp` | `auth.otp.send` | — |
+| GET | `/auth/verify` | `auth.otp.verify-form` | — |
+| POST | `/auth/verify` | `auth.otp.verify` | — |
+| GET | `/auth/complete-profile` | `auth.otp.complete-profile-form` | auth |
+| POST | `/auth/complete-profile` | `auth.otp.complete-profile` | auth |
+| POST | `/auth/logout` | `auth.otp.logout` | — |
+| GET | `/admin` | `admin.index` | auth, admin |
+| POST | `/admin/ads/{ad}/approve` | `admin.ads.approve` | auth, admin |
+| POST | `/admin/ads/{ad}/reject` | `admin.ads.reject` | auth, admin |
+
+---
+
+## ۲۱. کارهای باقی‌مانده (پیشنهادی)
+
+- [ ] اجباری کردن `complete-profile` قبل از ثبت آگهی (middleware)
+- [ ] پنل ادمین کامل‌تر (Filament یا داشبورد آمار)
+- [ ] `schema.org` JSON-LD برای SEO
+- [ ] `sitemap.xml` و `robots.txt`
+- [ ] جستجوی AJAX بدون reload صفحه (فعلاً submit فرم با debounce)
+- [ ] تبدیل `favicon.ico` از لوگو برای مرورگرهای قدیمی

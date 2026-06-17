@@ -11,7 +11,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             RankSeeder::class,
             EducationLevelSeeder::class,
-            MilitaryOrganizationSeeder::class,
+            MilitaryBranchSeeder::class,
             ProvinceAndCitySeeder::class,
             DemoAdsSeeder::class,
         ]);

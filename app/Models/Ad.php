@@ -9,7 +9,7 @@ class Ad extends Model
 {
     use SoftDeletes;
 
-    protected $fillable = ['user_id','title','description','current_province_id','current_city_id','current_branch_id','desired_province_id','desired_city_id','rank_id','education_level_id','phone','status','admin_note','approved_at','expires_at','is_active','views','edited_after_approval'];
+    protected $fillable = ['user_id','title','description','current_province_id','current_city_id','current_branch_id','unit_name','desired_province_id','desired_city_id','rank_id','education_level_id','phone','status','admin_note','approved_at','expires_at','is_active','views','edited_after_approval'];
 
     protected function casts(): array
     {
@@ -29,4 +29,5 @@ class Ad extends Model
     public function desiredCity() { return $this->belongsTo(City::class, 'desired_city_id'); }
     public function rank() { return $this->belongsTo(Rank::class); }
     public function educationLevel() { return $this->belongsTo(EducationLevel::class); }
+    public function reports() { return $this->hasMany(AdReport::class); }
 }

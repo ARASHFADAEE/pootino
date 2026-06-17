@@ -2,7 +2,22 @@
     <a href="{{ route('ads.show', $ad) }}" class="absolute inset-0 z-0" aria-label="مشاهده آگهی {{ $ad->title }}"></a>
     <div class="mb-3 flex items-center justify-between text-xs text-slate-500">
         <span class="rounded-full bg-green-50 px-2 py-1 text-green-700">فعال</span>
-        <span>{{ $ad->approved_at ? verta($ad->approved_at)->format('Y/m/d') : '-'  }}</span>
+        @if($ad->approved_at)
+            @php
+                $diffDays = (int) $ad->approved_at->diffInDays(now());
+                $dateLabel = match(true) {
+                    $diffDays === 0  => 'امروز',
+                    $diffDays === 1  => 'دیروز',
+                    $diffDays === 2  => '۲ روز پیش',
+                    $diffDays <= 6   => fa_num($diffDays) . ' روز پیش',
+                    $diffDays <= 29  => fa_num((int) ceil($diffDays / 7)) . ' هفته پیش',
+                    default          => \Morilog\Jalali\Jalalian::fromCarbon($ad->approved_at)->format('j F'),
+                };
+            @endphp
+            <span class="text-xs text-gray-400">{{ $dateLabel }}</span>
+        @else
+            <span class="text-xs text-gray-400">-</span>
+        @endif
     </div>
 
     <h3 class="mb-2 line-clamp-2 text-sm font-bold leading-6 text-slate-900">{{ $ad->title }}</h3>

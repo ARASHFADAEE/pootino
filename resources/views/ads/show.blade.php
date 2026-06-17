@@ -3,7 +3,7 @@
 @section('title', $ad->title)
 
 @section('content')
-<section class="mx-auto w-full max-w-4xl px-4 py-6 sm:px-6 lg:px-8" x-data="{ copied: false }">
+<section class="mx-auto w-full max-w-4xl px-4 py-6 sm:px-6 lg:px-8" x-data="{ copied: false, reportOpen: false }">
     <div class="rounded-2xl border border-slate-200 bg-white p-5 sm:p-7">
         <h1 class="text-xl font-extrabold text-slate-900 sm:text-2xl">{{ $ad->title }}</h1>
         <p class="mt-4 text-sm leading-7 text-slate-700">{{ $ad->description ?: 'توضیحی ثبت نشده است.' }}</p>
@@ -13,6 +13,10 @@
             <div class="rounded-xl bg-slate-50 p-3">مقصد: {{ $ad->desiredCity->name }} - {{ $ad->desiredProvince->name }}</div>
             <div class="rounded-xl bg-slate-50 p-3">درجه: {{ $ad->rank->name }}</div>
             <div class="rounded-xl bg-slate-50 p-3">تحصیلات: {{ $ad->educationLevel->name }}</div>
+            @if($ad->currentBranch)
+                <div class="rounded-xl bg-slate-50 p-3">نیرو: {{ $ad->currentBranch->typeLabel() }}</div>
+                <div class="rounded-xl bg-slate-50 p-3">یگان: {{ $ad->unit_name ?: $ad->currentBranch->name }}</div>
+            @endif
         </div>
 
         <div class="mt-5 rounded-2xl border border-slate-200 bg-slate-50/70 p-4 sm:p-5">
@@ -35,6 +39,71 @@
                     <a href="{{ route('auth.otp.phone') }}" class="mt-3 inline-block rounded-xl bg-[var(--color-primary-700)] px-4 py-2 text-sm font-semibold text-white">ورود / ثبت‌نام</a>
                 </div>
             @endauth
+        </div>
+
+        @if($ad->approved_at)
+            <div class="flex items-center gap-2 text-sm text-gray-500 border-t pt-4 mt-4">
+                <span>📅 تاریخ درج آگهی:</span>
+                <span class="font-medium text-gray-700">
+                    {{ \Morilog\Jalali\Jalalian::fromCarbon($ad->approved_at)->format('l، j F Y') }}
+                </span>
+                <span class="text-gray-400 text-xs">({{ $ad->approved_at->diffForHumans() }})</span>
+            </div>
+        @endif
+    </div>
+
+    <div class="mt-6 flex justify-center">
+        @auth
+            <button
+                type="button"
+                @click="reportOpen = true"
+                class="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-600 transition hover:border-rose-300 hover:text-rose-700"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6H8.5l-1 1H5a2 2 0 01-2-2zm9-13.5V9" />
+                </svg>
+                گزارش آگهی
+            </button>
+        @else
+            <a href="{{ route('auth.otp.phone') }}" class="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-600 transition hover:border-rose-300 hover:text-rose-700">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6H8.5l-1 1H5a2 2 0 01-2-2zm9-13.5V9" />
+                </svg>
+                گزارش آگهی
+            </a>
+        @endauth
+    </div>
+
+    <div
+        x-show="reportOpen"
+        x-transition
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+        @keydown.escape.window="reportOpen = false"
+    >
+        <div @click.outside="reportOpen = false" class="w-full max-w-md rounded-2xl bg-white p-5 shadow-xl">
+            <h3 class="text-base font-bold text-slate-900">گزارش آگهی</h3>
+            <p class="mt-1 text-sm text-slate-500">دلیل گزارش را انتخاب کنید.</p>
+
+            <form method="POST" action="{{ route('ads.report', $ad) }}" class="mt-4 space-y-4">
+                @csrf
+                <div>
+                    <label class="mb-1 block text-sm font-semibold text-slate-700">دلیل گزارش</label>
+                    <select name="reason" required class="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm">
+                        <option value="fake">اطلاعات نادرست</option>
+                        <option value="duplicate">آگهی تکراری</option>
+                        <option value="spam">اسپم</option>
+                        <option value="other">سایر</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="mb-1 block text-sm font-semibold text-slate-700">توضیحات (اختیاری)</label>
+                    <textarea name="description" rows="3" maxlength="300" class="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm" placeholder="توضیح کوتاه..."></textarea>
+                </div>
+                <div class="flex gap-2">
+                    <button type="button" @click="reportOpen = false" class="flex-1 rounded-xl border border-slate-300 py-2.5 text-sm">انصراف</button>
+                    <button type="submit" class="flex-1 rounded-xl bg-rose-700 py-2.5 text-sm font-semibold text-white">ثبت گزارش</button>
+                </div>
+            </form>
         </div>
     </div>
 

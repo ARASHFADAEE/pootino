@@ -26,11 +26,12 @@ class DemoAdsSeeder extends Seeder
         ])->map(fn ($u) => User::firstOrCreate(['phone' => $u['phone']], $u));
 
         $cities = City::inRandomOrder()->limit(20)->get();
-        $branches = MilitaryBranch::inRandomOrder()->limit(5)->get();
         $ranks = Rank::query()->get();
         $educationLevels = EducationLevel::query()->get();
+        $branchTypes = ['army', 'sepah', 'police'];
+        $unitNames = ['یگان ۶۵ نوهد', 'پادگان ۰۲ تهران', 'گردان ۱۲ مشهد', 'پایگاه شهید بابایی', 'یگان ویژه'];
 
-        if ($cities->count() < 2 || $branches->isEmpty() || $ranks->isEmpty() || $educationLevels->isEmpty()) {
+        if ($cities->count() < 2 || $ranks->isEmpty() || $educationLevels->isEmpty()) {
             return;
         }
 
@@ -53,6 +54,12 @@ class DemoAdsSeeder extends Seeder
             $from = $cities->random();
             $to = $cities->where('id', '!=', $from->id)->random();
             $user = $users[$i % $users->count()];
+            $unitName = $unitNames[$i % count($unitNames)];
+
+            $branch = MilitaryBranch::create([
+                'type' => $branchTypes[$i % count($branchTypes)],
+                'name' => $unitName,
+            ]);
 
             Ad::create([
                 'user_id' => $user->id,
@@ -60,7 +67,8 @@ class DemoAdsSeeder extends Seeder
                 'description' => 'آگهی دمو برای تست تجربه کاربری نسخه موبایل و دسکتاپ.',
                 'current_province_id' => $from->province_id,
                 'current_city_id' => $from->id,
-                'current_branch_id' => $branches->random()->id,
+                'current_branch_id' => $branch->id,
+                'unit_name' => $unitName,
                 'desired_province_id' => $to->province_id,
                 'desired_city_id' => $to->id,
                 'rank_id' => $ranks->random()->id,

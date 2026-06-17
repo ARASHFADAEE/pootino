@@ -8,7 +8,7 @@ use App\Jobs\SendAdToTelegramJob;
 use App\Models\Ad;
 use App\Models\City;
 use App\Models\EducationLevel;
-use App\Models\MilitaryOrganization;
+use App\Models\MilitaryBranch;
 use App\Models\Province;
 use App\Models\Rank;
 use Illuminate\Database\QueryException;
@@ -22,14 +22,13 @@ class AdController extends Controller
     {
         $filters = $request->only([
             'current_province_id', 'current_city_id', 'desired_province_id',
-            'desired_city_id', 'rank_id', 'education_level_id', 'organization_id',
-            'branch_id', 'search',
+            'desired_city_id', 'rank_id', 'education_level_id', 'search',
         ]);
 
         try {
             $ads = Ad::approved()
                 ->with([
-                    'currentProvince', 'currentCity', 'currentBranch.organization',
+                    'currentProvince', 'currentCity', 'currentBranch',
                     'desiredProvince', 'desiredCity', 'rank', 'educationLevel',
                 ])
                 ->when($filters['current_province_id'] ?? null, fn ($q, $v) => $q->where('current_province_id', $v))
@@ -38,8 +37,6 @@ class AdController extends Controller
                 ->when($filters['desired_city_id'] ?? null, fn ($q, $v) => $q->where('desired_city_id', $v))
                 ->when($filters['rank_id'] ?? null, fn ($q, $v) => $q->where('rank_id', $v))
                 ->when($filters['education_level_id'] ?? null, fn ($q, $v) => $q->where('education_level_id', $v))
-                ->when($filters['branch_id'] ?? null, fn ($q, $v) => $q->where('current_branch_id', $v))
-                ->when($filters['organization_id'] ?? null, fn ($q, $v) => $q->whereHas('currentBranch', fn ($bq) => $bq->where('organization_id', $v)))
                 ->when($filters['search'] ?? null, function ($q, $search) {
                     $q->where(fn ($sub) => $sub->where('title', 'like', "%{$search}%")->orWhere('description', 'like', "%{$search}%"));
                 })
@@ -55,13 +52,11 @@ class AdController extends Controller
         try {
             $provinces = Province::query()->get();
             $cities = City::query()->orderBy('name')->get();
-            $organizations = MilitaryOrganization::with('branches')->get();
             $ranks = Rank::query()->get();
             $educationLevels = EducationLevel::query()->get();
         } catch (QueryException) {
             $provinces = collect();
             $cities = collect();
-            $organizations = collect();
             $ranks = collect();
             $educationLevels = collect();
         }
@@ -71,7 +66,6 @@ class AdController extends Controller
             'filters' => $filters,
             'provinces' => $provinces,
             'cities' => $cities,
-            'organizations' => $organizations,
             'ranks' => $ranks,
             'educationLevels' => $educationLevels,
             'totalActive' => $totalActive,
@@ -85,7 +79,7 @@ class AdController extends Controller
         $ad->increment('views');
         $ad->load([
             'user',
-            'currentProvince', 'currentCity', 'currentBranch.organization',
+            'currentProvince', 'currentCity', 'currentBranch',
             'desiredProvince', 'desiredCity', 'rank', 'educationLevel',
         ]);
 
@@ -108,7 +102,11 @@ class AdController extends Controller
     {
         /** @var \App\Models\User $user */
         $user = $request->user();
-        $ad = $user->ads()->create($request->validated());
+        $validated = $request->validated();
+        $validated['current_branch_id'] = $this->createBranch($validated['branch_type'], $validated['unit_name']);
+        unset($validated['branch_type']);
+
+        $ad = $user->ads()->create($validated);
         SendAdToTelegramJob::dispatch($ad);
 
         return redirect()->route('ads.my')->with('success', 'آگهی شما ثبت شد و پس از تایید منتشر می‌شود.');
@@ -117,6 +115,7 @@ class AdController extends Controller
     public function edit(Ad $ad)
     {
         abort_if($ad->user_id !== Auth::id(), 403);
+        $ad->load('currentBranch');
 
         return view('ads.edit', array_merge($this->formData(), ['ad' => $ad]));
     }
@@ -125,8 +124,12 @@ class AdController extends Controller
     {
         abort_if($ad->user_id !== Auth::id(), 403);
 
+        $validated = $request->validated();
+        $validated['current_branch_id'] = $this->createBranch($validated['branch_type'], $validated['unit_name']);
+        unset($validated['branch_type']);
+
         $ad->update([
-            ...$request->validated(),
+            ...$validated,
             'status' => 'pending',
             'approved_at' => null,
             'expires_at' => null,
@@ -160,9 +163,16 @@ class AdController extends Controller
         return [
             'provinces' => Province::orderBy('name')->get(),
             'cities' => City::orderBy('name')->get(),
-            'organizations' => MilitaryOrganization::with('branches')->get(),
             'ranks' => Rank::orderBy('order')->get(),
             'educationLevels' => EducationLevel::orderBy('order')->get(),
         ];
+    }
+
+    private function createBranch(string $type, string $name): int
+    {
+        return MilitaryBranch::create([
+            'type' => $type,
+            'name' => $name,
+        ])->id;
     }
 }

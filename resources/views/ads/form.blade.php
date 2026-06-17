@@ -41,14 +41,16 @@
             </select>
         </div>
         <div>
-            <label class="mb-1 block text-sm font-semibold text-slate-700">شاخه نیرو</label>
-            <select data-searchable class="w-full rounded-xl border-slate-300" name="current_branch_id">
-                @foreach($organizations as $organization)
-                    @foreach($organization->branches as $branch)
-                        <option value="{{ $branch->id }}" @selected(old('current_branch_id', $ad->current_branch_id ?? '') == $branch->id)>{{ $organization->name }} - {{ $branch->name }}</option>
-                    @endforeach
-                @endforeach
+            <label class="mb-1 block text-sm font-semibold text-slate-700">نیروی نظامی</label>
+            <select class="w-full rounded-xl border-slate-300" name="branch_type">
+                <option value="army" @selected(old('branch_type', $editing ? ($ad->currentBranch->type ?? '') : '') === 'army')>ارتش جمهوری اسلامی</option>
+                <option value="sepah" @selected(old('branch_type', $editing ? ($ad->currentBranch->type ?? '') : '') === 'sepah')>سپاه پاسداران</option>
+                <option value="police" @selected(old('branch_type', $editing ? ($ad->currentBranch->type ?? '') : '') === 'police')>نیروی انتظامی</option>
             </select>
+        </div>
+        <div>
+            <label class="mb-1 block text-sm font-semibold text-slate-700">نام یگان</label>
+            <input class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[var(--color-primary-700)] focus:ring-[var(--color-primary-700)]" name="unit_name" value="{{ old('unit_name', $editing ? ($ad->unit_name ?? $ad->currentBranch->name ?? '') : '') }}" placeholder="مثال: یگان ۶۵ نوهد" />
         </div>
         <div>
             <label class="mb-1 block text-sm font-semibold text-slate-700">درجه</label>

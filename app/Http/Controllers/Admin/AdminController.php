@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Ad;
+use App\Models\AdReport;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
@@ -15,12 +16,23 @@ class AdminController extends Controller
 
         $ads = Ad::query()
             ->with(['user', 'currentCity', 'desiredCity'])
+            ->withCount('reports')
             ->when($status, fn ($q) => $q->where('status', $status))
             ->latest()
             ->paginate(20)
             ->withQueryString();
 
         return view('admin.index', compact('ads', 'status'));
+    }
+
+    public function reports()
+    {
+        $reports = AdReport::query()
+            ->with(['ad', 'user'])
+            ->latest()
+            ->paginate(30);
+
+        return view('admin.reports', compact('reports'));
     }
 
     public function approve(Ad $ad): RedirectResponse

@@ -6,10 +6,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class MilitaryBranch extends Model
 {
-    protected $fillable = ['organization_id', 'name'];
+    protected $fillable = ['type', 'name'];
 
-    public function organization()
+    public function typeLabel(): string
     {
-        return $this->belongsTo(MilitaryOrganization::class, 'organization_id');
+        return match ($this->type) {
+            'army' => 'ارتش جمهوری اسلامی',
+            'sepah' => 'سپاه پاسداران',
+            'police' => 'نیروی انتظامی',
+            default => $this->type,
+        };
     }
 }
