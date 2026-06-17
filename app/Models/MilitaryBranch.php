@@ -14,7 +14,7 @@ class MilitaryBranch extends Model
             'army' => 'ارتش جمهوری اسلامی',
             'sepah' => 'سپاه پاسداران',
             'police' => 'نیروی انتظامی',
-            default => $this->type,
+            default => $this->type ?: 'نامشخص',
         };
     }
 }

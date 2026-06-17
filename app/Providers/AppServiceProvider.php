@@ -12,13 +12,5 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(SmsIrService::class, fn () => new SmsIrService());
     }
 
-    public function boot(): void
-    {
-        if (! function_exists('fa_num')) {
-            function fa_num(int $n): string
-            {
-                return str_replace(range(0, 9), ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'], (string) $n);
-            }
-        }
-    }
+    public function boot(): void {}
 }
