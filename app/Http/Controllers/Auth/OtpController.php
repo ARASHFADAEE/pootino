@@ -21,6 +21,7 @@ class OtpController extends Controller
     public function showPhoneForm() { return view('auth.phone'); }
     public function showVerifyForm() { return view('auth.verify'); }
     public function showCompleteProfileForm() { return view('auth.complete-profile'); }
+    public function showVerificationRequired() { return view('auth.verification-required'); }
 
     public function sendOtp(Request $request)
     {
@@ -134,7 +135,7 @@ class OtpController extends Controller
 
         session(['otp_sehatsanji_shenase' => $kyc['shenase'] ?? null]);
 
-        return redirect()->route('ads.index')->with('success', 'ثبت‌نام شما تکمیل شد.');
+        return redirect()->intended(route('ads.index'))->with('success', 'ثبت‌نام شما تکمیل شد.');
     }
 
     public function logout(Request $request)

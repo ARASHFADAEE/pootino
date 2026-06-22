@@ -11,8 +11,8 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [AdController::class, 'index'])->name('ads.index');
 
 Route::middleware('auth')->group(function () {
-    Route::get('/ads/create', [AdController::class, 'create'])->name('ads.create');
-    Route::post('/ads', [AdController::class, 'store'])->name('ads.store');
+    Route::get('/ads/create', [AdController::class, 'create'])->middleware('verified.identity')->name('ads.create');
+    Route::post('/ads', [AdController::class, 'store'])->middleware('verified.identity')->name('ads.store');
     Route::get('/ads/{ad}/edit', [AdController::class, 'edit'])->name('ads.edit');
     Route::put('/ads/{ad}', [AdController::class, 'update'])->name('ads.update');
     Route::delete('/ads/{ad}', [AdController::class, 'destroy'])->name('ads.destroy');
@@ -29,6 +29,7 @@ Route::prefix('auth')->name('auth.otp.')->group(function () {
     Route::post('/resend', [OtpController::class, 'resendOtp'])->name('resend');
     Route::get('/complete-profile', [OtpController::class, 'showCompleteProfileForm'])->middleware('auth')->name('complete-profile-form');
     Route::post('/complete-profile', [OtpController::class, 'completeProfile'])->middleware('auth')->name('complete-profile');
+    Route::get('/verification-required', [OtpController::class, 'showVerificationRequired'])->middleware('auth')->name('verification-required');
     Route::post('/logout', [OtpController::class, 'logout'])->name('logout');
 });
 

@@ -14,6 +14,11 @@ class User extends Authenticatable
 
     protected $hidden = ['remember_token'];
 
+    public function isIdentityVerified(): bool
+    {
+        return filled($this->national_code);
+    }
+
     public function ads(): HasMany
     {
         return $this->hasMany(Ad::class);
