@@ -39,7 +39,7 @@
                             <p>{{ $ad->user->name ?? '—' }}</p>
                             <p dir="ltr">{{ $ad->user->phone ?? '—' }}</p>
                         </td>
-                        <td class="px-3 py-3 text-slate-600">{{ $ad->currentCity->name ?? '-' }} → {{ $ad->desiredCity->name ?? '-' }}</td>
+                        <td class="px-3 py-3 text-slate-600">{{ $ad->currentProvince->name ?? '-' }} → {{ $ad->desiredProvince->name ?? '-' }}</td>
                         <td class="px-3 py-3">
                             <span class="rounded-full bg-slate-100 px-2 py-1 text-xs text-slate-700">{{ $ad->status }}</span>
                         </td>

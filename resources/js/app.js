@@ -1,7 +1,9 @@
 import Alpine from 'alpinejs';
 import TomSelect from 'tom-select';
+import { jalaliDatePicker } from './jalali-datepicker.js';
 
 window.Alpine = Alpine;
+Alpine.data('jalaliDatePicker', jalaliDatePicker);
 Alpine.start();
 
 const instances = new WeakMap();

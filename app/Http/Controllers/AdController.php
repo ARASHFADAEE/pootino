@@ -6,7 +6,6 @@ use App\Http\Requests\StoreAdRequest;
 use App\Http\Requests\UpdateAdRequest;
 use App\Jobs\SendAdToTelegramJob;
 use App\Models\Ad;
-use App\Models\City;
 use App\Models\EducationLevel;
 use App\Models\MilitaryBranch;
 use App\Models\Province;
@@ -21,8 +20,7 @@ class AdController extends Controller
     public function index(Request $request)
     {
         $filters = $request->only([
-            'current_province_id', 'current_city_id', 'desired_province_id',
-            'desired_city_id', 'rank_id', 'education_level_id', 'search',
+            'current_province_id', 'desired_province_id', 'rank_id', 'education_level_id', 'search',
         ]);
 
         try {
@@ -32,9 +30,7 @@ class AdController extends Controller
                     'desiredProvince', 'desiredCity', 'rank', 'educationLevel',
                 ])
                 ->when($filters['current_province_id'] ?? null, fn ($q, $v) => $q->where('current_province_id', $v))
-                ->when($filters['current_city_id'] ?? null, fn ($q, $v) => $q->where('current_city_id', $v))
                 ->when($filters['desired_province_id'] ?? null, fn ($q, $v) => $q->where('desired_province_id', $v))
-                ->when($filters['desired_city_id'] ?? null, fn ($q, $v) => $q->where('desired_city_id', $v))
                 ->when($filters['rank_id'] ?? null, fn ($q, $v) => $q->where('rank_id', $v))
                 ->when($filters['education_level_id'] ?? null, fn ($q, $v) => $q->where('education_level_id', $v))
                 ->when($filters['search'] ?? null, function ($q, $search) {
@@ -51,12 +47,10 @@ class AdController extends Controller
 
         try {
             $provinces = Province::query()->get();
-            $cities = City::query()->orderBy('name')->get();
             $ranks = Rank::query()->get();
             $educationLevels = EducationLevel::query()->get();
         } catch (QueryException) {
             $provinces = collect();
-            $cities = collect();
             $ranks = collect();
             $educationLevels = collect();
         }
@@ -65,7 +59,6 @@ class AdController extends Controller
             'ads' => $ads,
             'filters' => $filters,
             'provinces' => $provinces,
-            'cities' => $cities,
             'ranks' => $ranks,
             'educationLevels' => $educationLevels,
             'totalActive' => $totalActive,
@@ -104,6 +97,8 @@ class AdController extends Controller
         $user = $request->user();
         $validated = $request->validated();
         $validated['current_branch_id'] = $this->createBranch($validated['branch_type'], $validated['unit_name']);
+        $validated['current_city_id'] = null;
+        $validated['desired_city_id'] = null;
         unset($validated['branch_type']);
 
         $ad = $user->ads()->create($validated);
@@ -126,6 +121,8 @@ class AdController extends Controller
 
         $validated = $request->validated();
         $validated['current_branch_id'] = $this->createBranch($validated['branch_type'], $validated['unit_name']);
+        $validated['current_city_id'] = null;
+        $validated['desired_city_id'] = null;
         unset($validated['branch_type']);
 
         $ad->update([
@@ -153,7 +150,7 @@ class AdController extends Controller
     {
         /** @var \App\Models\User $user */
         $user = Auth::user();
-        $ads = $user->ads()->with(['currentCity', 'desiredCity', 'rank'])->latest()->paginate(10);
+        $ads = $user->ads()->with(['currentProvince', 'desiredProvince', 'rank'])->latest()->paginate(10);
 
         return view('ads.my-ads', compact('ads'));
     }
@@ -162,7 +159,6 @@ class AdController extends Controller
     {
         return [
             'provinces' => Province::orderBy('name')->get(),
-            'cities' => City::orderBy('name')->get(),
             'ranks' => Rank::orderBy('order')->get(),
             'educationLevels' => EducationLevel::orderBy('order')->get(),
         ];

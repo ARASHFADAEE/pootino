@@ -31,6 +31,65 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="font-sans text-slate-800">
+<div id="page-loader"
+     style="
+       position: fixed; inset: 0; z-index: 9999;
+       background: #f5f0e8;
+       display: flex; flex-direction: column;
+       align-items: center; justify-content: center; gap: 20px;
+       transition: opacity 0.4s ease, visibility 0.4s ease;
+     ">
+    <div style="font-size: 52px; animation: loader-bounce 1.2s ease-in-out infinite;">
+        <img src="{{ asset('img/logo-pootino.png') }}" alt="پوتینو" class="h-10 w-auto" />
+    </div>
+
+    <p style="
+      font-family: 'IRANYekanXVF', Tahoma, sans-serif;
+      font-size: 18px; font-weight: 700;
+      color: #3d5229; letter-spacing: 0.02em;
+    ">پوتینو</p>
+
+    <div style="
+      width: 200px; height: 4px;
+      background: #e8e0d0; border-radius: 99px; overflow: hidden;
+    ">
+        <div style="
+          height: 100%; width: 40%;
+          background: #3d5229; border-radius: 99px;
+          animation: loader-bar 1.2s ease-in-out infinite;
+        "></div>
+    </div>
+
+    <p style="
+      font-family: 'IRANYekanXVF', Tahoma, sans-serif;
+      font-size: 13px; color: #888; margin: 0;
+    ">در حال بارگذاری...</p>
+</div>
+
+<style>
+@keyframes loader-bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+
+@keyframes loader-bar {
+    0% { transform: translateX(-100%); }
+    60% { transform: translateX(200%); }
+    100% { transform: translateX(200%); }
+}
+</style>
+
+<script>
+    window.addEventListener('load', function () {
+        const loader = document.getElementById('page-loader');
+        if (loader) {
+            loader.style.opacity = '0';
+            loader.style.visibility = 'hidden';
+            setTimeout(() => loader.remove(), 400);
+        }
+    });
+</script>
+
 <div class="min-h-screen" x-data="{ menuOpen: false }">
     <header class="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur">
         <nav class="mx-auto flex h-16 w-full max-w-7xl items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">

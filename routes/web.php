@@ -41,3 +41,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::post('/ads/{ad}/approve', [AdminController::class, 'approve'])->name('ads.approve');
     Route::post('/ads/{ad}/reject', [AdminController::class, 'reject'])->name('ads.reject');
 });
+
+
+
+Route::get('/test', function () {
+    return view('test');
+});

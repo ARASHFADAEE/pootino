@@ -1,29 +1,15 @@
 <form method="GET" class="space-y-3 text-sm">
-    <select name="current_province_id" data-searchable data-province-select="current" class="w-full rounded-xl border-slate-300">
+    <select name="current_province_id" data-searchable class="w-full rounded-xl border-slate-300">
         <option value="">استان محل فعلی</option>
         @foreach($provinces as $p)
             <option value="{{ $p->id }}" @selected(($filters['current_province_id'] ?? '') == $p->id)>{{ $p->name }}</option>
         @endforeach
     </select>
 
-    <select name="current_city_id" data-searchable data-city-select="current" class="w-full rounded-xl border-slate-300">
-        <option value="">شهر محل فعلی</option>
-        @foreach($cities as $city)
-            <option data-province-id="{{ $city->province_id }}" value="{{ $city->id }}" @selected(($filters['current_city_id'] ?? '') == $city->id)>{{ $city->name }}</option>
-        @endforeach
-    </select>
-
-    <select name="desired_province_id" data-searchable data-province-select="desired" class="w-full rounded-xl border-slate-300">
+    <select name="desired_province_id" data-searchable class="w-full rounded-xl border-slate-300">
         <option value="">استان مقصد</option>
         @foreach($provinces as $p)
             <option value="{{ $p->id }}" @selected(($filters['desired_province_id'] ?? '') == $p->id)>{{ $p->name }}</option>
-        @endforeach
-    </select>
-
-    <select name="desired_city_id" data-searchable data-city-select="desired" class="w-full rounded-xl border-slate-300">
-        <option value="">شهر مقصد</option>
-        @foreach($cities as $city)
-            <option data-province-id="{{ $city->province_id }}" value="{{ $city->id }}" @selected(($filters['desired_city_id'] ?? '') == $city->id)>{{ $city->name }}</option>
         @endforeach
     </select>
 

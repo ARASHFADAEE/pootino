@@ -11,7 +11,7 @@
                     <div class="flex flex-wrap items-center justify-between gap-3">
                         <div>
                             <h2 class="font-bold">{{ $ad->title }}</h2>
-                            <p class="text-xs text-slate-500">{{ $ad->currentCity->name ?? '-' }} ← {{ $ad->desiredCity->name ?? '-' }}</p>
+                            <p class="text-xs text-slate-500">{{ $ad->currentProvince->name ?? '-' }} ← {{ $ad->desiredProvince->name ?? '-' }}</p>
                         </div>
                         <div class="flex gap-2">
                             <a href="{{ route('ads.edit', $ad) }}" class="rounded-lg border border-slate-300 px-3 py-1.5 text-xs">ویرایش</a>

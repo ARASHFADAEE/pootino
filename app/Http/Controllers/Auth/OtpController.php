@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\Otp;
 use App\Models\User;
-use App\Services\ShahkarKycService;
+use App\Services\SehatsanjiKycService;
 use App\Services\SmsIrService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,7 +15,7 @@ class OtpController extends Controller
 {
     public function __construct(
         protected SmsIrService $sms,
-        protected ShahkarKycService $shahkar
+        protected SehatsanjiKycService $sehatsanji
     ) {}
 
     public function showPhoneForm() { return view('auth.phone'); }
@@ -91,33 +91,48 @@ class OtpController extends Controller
     public function completeProfile(Request $request)
     {
         $request->validate([
-            'name' => ['required', 'string', 'max:50'],
+            'first_name' => ['required', 'string', 'max:50'],
+            'family' => ['required', 'string', 'max:50'],
+            'father_name' => ['required', 'string', 'max:50'],
             'national_code' => ['required', 'digits:10', function ($attribute, $value, $fail) {
                 if (! $this->isValidIranianNationalCode($value)) {
                     $fail('کد ملی معتبر نیست.');
                 }
             }],
+            'birth_date' => ['required', 'regex:/^\d{4}\/\d{2}\/\d{2}$/'],
+        ], [
+            'birth_date.regex' => 'تاریخ تولد باید به فرمت 1381/07/10 باشد.',
         ]);
 
         /** @var User $user */
         $user = $request->user();
         $nationalCode = $request->string('national_code')->toString();
-        $isLocalEnv = app()->environment('local');
 
-        $kyc = ['ok' => true, 'track_id' => null];
-        if (! $isLocalEnv) {
-            $kyc = $this->shahkar->verifyMobileNationalCode($user->phone, $nationalCode);
-            if (! ($kyc['ok'] ?? false)) {
-                return back()->withInput()->withErrors(['national_code' => $kyc['message'] ?? 'احراز هویت ناموفق بود.']);
-            }
+        $kyc = $this->sehatsanji->verifyIdentity(
+            idCode: $nationalCode,
+            birthDate: $request->string('birth_date')->toString(),
+            name: $request->string('first_name')->toString(),
+            family: $request->string('family')->toString(),
+            fatherName: $request->string('father_name')->toString(),
+            nationalId: $nationalCode,
+        );
+
+        if (! ($kyc['ok'] ?? false)) {
+            $field = $kyc['field'] ?? 'national_code';
+
+            return back()->withInput()->withErrors([
+                $field => $kyc['message'] ?? 'احراز هویت ناموفق بود.',
+            ]);
         }
 
+        $fullName = trim($request->string('first_name')->toString().' '.$request->string('family')->toString());
+
         $user->update([
-            'name' => $request->string('name')->toString(),
+            'name' => $fullName,
             'national_code' => $nationalCode,
         ]);
 
-        session(['otp_shahkar_track_id' => $kyc['track_id'] ?? null]);
+        session(['otp_sehatsanji_shenase' => $kyc['shenase'] ?? null]);
 
         return redirect()->route('ads.index')->with('success', 'ثبت‌نام شما تکمیل شد.');
     }
@@ -137,7 +152,7 @@ class OtpController extends Controller
             return false;
         }
 
-        if (preg_match('/^(\d){9}$/', $nationalCode)) {
+        if (preg_match('/^(\d)\1{9}$/', $nationalCode)) {
             return false;
         }
 

@@ -16,9 +16,9 @@ return [
         'bot_token' => env('TELEGRAM_BOT_TOKEN'),
         'admin_chat_id' => env('TELEGRAM_ADMIN_CHAT_ID'),
     ],
-    'finnotech' => [
-        'address' => env('FINNOTECH_ADDRESS', 'https://sandboxapi.finnotech.ir'),
-        'client_id' => env('FINNOTECH_CLIENT_ID'),
-        'token' => env('FINNOTECH_TOKEN'),
+    'sehatsanji' => [
+        'url' => env('SEHATSANJI_URL', 'https://sehatsanji.ir/API'),
+        'token' => env('SEHATSANJI_TOKEN'),
+        'timeout' => env('SEHATSANJI_TIMEOUT', 30),
     ],
 ];

@@ -23,8 +23,8 @@
     <h3 class="mb-2 line-clamp-2 text-sm font-bold leading-6 text-slate-900">{{ $ad->title }}</h3>
 
     <div class="space-y-1 text-xs text-slate-600">
-        <p>محل فعلی: <strong>{{ $ad->currentCity->name ?? '-' }}</strong></p>
-        <p>مقصد: <strong>{{ $ad->desiredCity->name ?? '-' }}</strong></p>
+        <p>محل فعلی: <strong>{{ $ad->currentProvince->name ?? '-' }}</strong></p>
+        <p>مقصد: <strong>{{ $ad->desiredProvince->name ?? '-' }}</strong></p>
         <p>درجه: <strong>{{ $ad->rank->name ?? '-' }}</strong></p>
     </div>
 

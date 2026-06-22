@@ -15,7 +15,7 @@ class AdminController extends Controller
         $status = $request->string('status')->toString();
 
         $ads = Ad::query()
-            ->with(['user', 'currentCity', 'desiredCity'])
+            ->with(['user', 'currentProvince', 'desiredProvince'])
             ->withCount('reports')
             ->when($status, fn ($q) => $q->where('status', $status))
             ->latest()

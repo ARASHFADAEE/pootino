@@ -9,8 +9,8 @@
         <p class="mt-4 text-sm leading-7 text-slate-700">{{ $ad->description ?: 'توضیحی ثبت نشده است.' }}</p>
 
         <div class="mt-5 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
-            <div class="rounded-xl bg-slate-50 p-3">محل فعلی: {{ $ad->currentCity->name }} - {{ $ad->currentProvince->name }}</div>
-            <div class="rounded-xl bg-slate-50 p-3">مقصد: {{ $ad->desiredCity->name }} - {{ $ad->desiredProvince->name }}</div>
+            <div class="rounded-xl bg-slate-50 p-3">محل فعلی: {{ $ad->currentProvince->name }}</div>
+            <div class="rounded-xl bg-slate-50 p-3">مقصد: {{ $ad->desiredProvince->name }}</div>
             <div class="rounded-xl bg-slate-50 p-3">درجه: {{ $ad->rank->name }}</div>
             <div class="rounded-xl bg-slate-50 p-3">تحصیلات: {{ $ad->educationLevel->name }}</div>
             @if($ad->currentBranch)

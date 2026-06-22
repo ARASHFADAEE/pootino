@@ -18,26 +18,14 @@
         </div>
         <div>
             <label class="mb-1 block text-sm font-semibold text-slate-700">استان فعلی</label>
-            <select data-searchable class="w-full rounded-xl border-slate-300" name="current_province_id" data-province-select="current">
+            <select data-searchable class="w-full rounded-xl border-slate-300" name="current_province_id">
                 @foreach($provinces as $p)<option value="{{ $p->id }}" @selected(old('current_province_id', $ad->current_province_id ?? '') == $p->id)>{{ $p->name }}</option>@endforeach
             </select>
         </div>
         <div>
-            <label class="mb-1 block text-sm font-semibold text-slate-700">شهر فعلی</label>
-            <select data-searchable class="w-full rounded-xl border-slate-300" name="current_city_id" data-city-select="current">
-                @foreach($cities as $city)<option data-province-id="{{ $city->province_id }}" value="{{ $city->id }}" @selected(old('current_city_id', $ad->current_city_id ?? '') == $city->id)>{{ $city->name }}</option>@endforeach
-            </select>
-        </div>
-        <div>
             <label class="mb-1 block text-sm font-semibold text-slate-700">استان مقصد</label>
-            <select data-searchable class="w-full rounded-xl border-slate-300" name="desired_province_id" data-province-select="desired">
+            <select data-searchable class="w-full rounded-xl border-slate-300" name="desired_province_id">
                 @foreach($provinces as $p)<option value="{{ $p->id }}" @selected(old('desired_province_id', $ad->desired_province_id ?? '') == $p->id)>{{ $p->name }}</option>@endforeach
-            </select>
-        </div>
-        <div>
-            <label class="mb-1 block text-sm font-semibold text-slate-700">شهر مقصد</label>
-            <select data-searchable class="w-full rounded-xl border-slate-300" name="desired_city_id" data-city-select="desired">
-                @foreach($cities as $city)<option data-province-id="{{ $city->province_id }}" value="{{ $city->id }}" @selected(old('desired_city_id', $ad->desired_city_id ?? '') == $city->id)>{{ $city->name }}</option>@endforeach
             </select>
         </div>
         <div>
