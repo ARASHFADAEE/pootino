@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Otp;
 use App\Models\User;
 use App\Services\SehatsanjiKycService;
+use App\Services\ShahkarKycService;
 use App\Services\SmsIrService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,7 +16,8 @@ class OtpController extends Controller
 {
     public function __construct(
         protected SmsIrService $sms,
-        protected SehatsanjiKycService $sehatsanji
+        protected SehatsanjiKycService $sehatsanji,
+        protected ShahkarKycService $shahkar,
     ) {}
 
     public function showPhoneForm() { return view('auth.phone'); }
@@ -100,7 +102,11 @@ class OtpController extends Controller
                     $fail('کد ملی معتبر نیست.');
                 }
             }],
-            'birth_date' => ['required', 'regex:/^\d{4}\/\d{2}\/\d{2}$/'],
+            'birth_date' => ['required', 'regex:/^\d{4}\/\d{2}\/\d{2}$/', function ($attribute, $value, $fail) {
+                if (! is_valid_jalali_birth_age($value)) {
+                    $fail('سن باید بین ۱۸ تا ۱۲۰ سال باشد.');
+                }
+            }],
         ], [
             'birth_date.regex' => 'تاریخ تولد باید به فرمت 1381/07/10 باشد.',
         ]);
@@ -108,6 +114,13 @@ class OtpController extends Controller
         /** @var User $user */
         $user = $request->user();
         $nationalCode = $request->string('national_code')->toString();
+
+        $shahkar = $this->shahkar->verifyPhoneNationalCode($user->phone, $nationalCode);
+        if (! ($shahkar['ok'] ?? false)) {
+            return back()->withInput()->withErrors([
+                'identity' => $shahkar['message'] ?? 'شماره تلفن یا مشخصات شما با اطلاعات هویتی شما منطبق نمی‌باشد.',
+            ]);
+        }
 
         $kyc = $this->sehatsanji->verifyIdentity(
             idCode: $nationalCode,
@@ -120,9 +133,17 @@ class OtpController extends Controller
 
         if (! ($kyc['ok'] ?? false)) {
             $field = $kyc['field'] ?? 'national_code';
+            $message = $kyc['message'] ?? 'احراز هویت ناموفق بود.';
+
+            if (in_array($field, ['national_code', 'birth_date', 'first_name', 'family', 'father_name'], true)) {
+                return back()->withInput()->withErrors([
+                    'identity' => 'شماره تلفن یا مشخصات شما با اطلاعات هویتی شما منطبق نمی‌باشد.',
+                    $field => $message,
+                ]);
+            }
 
             return back()->withInput()->withErrors([
-                $field => $kyc['message'] ?? 'احراز هویت ناموفق بود.',
+                $field => $message,
             ]);
         }
 

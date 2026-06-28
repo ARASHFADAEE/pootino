@@ -17,8 +17,6 @@ class StoreAdRequest extends FormRequest
             'branch_type' => 'required|in:army,sepah,police',
             'unit_name' => 'required|string|max:100',
             'desired_province_id' => 'required|exists:provinces,id',
-            'rank_id' => 'required|exists:ranks,id',
-            'education_level_id' => 'required|exists:education_levels,id',
             'phone' => ['required', 'regex:/^09[0-9]{9}$/'],
         ];
     }

@@ -6,17 +6,19 @@
 <section class="mx-auto w-full max-w-4xl px-4 py-6 sm:px-6 lg:px-8" x-data="{ copied: false, reportOpen: false }">
     <div class="rounded-2xl border border-slate-200 bg-white p-5 sm:p-7">
         <h1 class="text-xl font-extrabold text-slate-900 sm:text-2xl">{{ $ad->title }}</h1>
-        <p class="mt-4 text-sm leading-7 text-slate-700">{{ $ad->description ?: 'توضیحی ثبت نشده است.' }}</p>
 
         <div class="mt-5 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
-            <div class="rounded-xl bg-slate-50 p-3">محل فعلی: {{ $ad->currentProvince->name }}</div>
-            <div class="rounded-xl bg-slate-50 p-3">مقصد: {{ $ad->desiredProvince->name }}</div>
-            <div class="rounded-xl bg-slate-50 p-3">درجه: {{ $ad->rank->name }}</div>
-            <div class="rounded-xl bg-slate-50 p-3">تحصیلات: {{ $ad->educationLevel->name }}</div>
+            <div class="rounded-xl bg-slate-50 p-3">محل خدمت فعلی: {{ $ad->currentProvince->name }}</div>
+            <div class="rounded-xl bg-slate-50 p-3">محل درخواستی: {{ $ad->desiredProvince->name }}</div>
+            <div class="rounded-xl bg-slate-50 p-3">درجه: {{ $ad->rank?->name ?? '-' }}</div>
             @if($ad->currentBranch)
-                <div class="rounded-xl bg-slate-50 p-3">نیرو: {{ $ad->currentBranch->typeLabel() }}</div>
-                <div class="rounded-xl bg-slate-50 p-3">یگان: {{ $ad->unit_name ?: $ad->currentBranch->name }}</div>
+                <div class="rounded-xl bg-slate-50 p-3">ارگان: {{ $ad->currentBranch->typeLabel() }}</div>
             @endif
+        </div>
+
+        <div class="mt-5 rounded-2xl border border-slate-200 bg-slate-50/70 p-4 sm:p-5">
+            <h2 class="mb-2 text-sm font-semibold text-slate-700">توضیحات متقاضی</h2>
+            <p class="text-sm leading-7 text-slate-700">{{ $ad->description ?: 'توضیحی ثبت نشده است.' }}</p>
         </div>
 
         <div class="mt-5 rounded-2xl border border-slate-200 bg-slate-50/70 p-4 sm:p-5">
@@ -42,12 +44,12 @@
         </div>
 
         @if($ad->approved_at)
-            <div class="flex items-center gap-2 text-sm text-gray-500 border-t pt-4 mt-4">
+            <div class="mt-4 flex items-center gap-2 border-t pt-4 text-sm text-gray-500">
                 <span>📅 تاریخ درج آگهی:</span>
                 <span class="font-medium text-gray-700">
                     {{ \Morilog\Jalali\Jalalian::fromCarbon($ad->approved_at)->format('l، j F Y') }}
                 </span>
-                <span class="text-gray-400 text-xs">({{ $ad->approved_at->diffForHumans() }})</span>
+                <span class="text-xs text-gray-400">({{ fa_time_ago($ad->approved_at) }})</span>
             </div>
         @endif
     </div>

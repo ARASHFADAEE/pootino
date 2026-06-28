@@ -21,4 +21,13 @@ return [
         'token' => env('SEHATSANJI_TOKEN'),
         'timeout' => env('SEHATSANJI_TIMEOUT', 30),
     ],
+    'finnotech' => [
+        'address' => env('FINNOTECH_ADDRESS', 'https://sandboxapi.finnotech.ir'),
+        'client_id' => env('FINNOTECH_CLIENT_ID'),
+        'token' => env('FINNOTECH_TOKEN'),
+    ],
+    'shahkar' => [
+        'timeout' => env('SHAHKAR_TIMEOUT', 20),
+        'enforce_in_local' => env('SHAHKAR_ENFORCE_IN_LOCAL', false),
+    ],
 ];

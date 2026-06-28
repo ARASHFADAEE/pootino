@@ -1,9 +1,9 @@
-const persianMonths = [
+export const persianMonths = [
     'فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور',
     'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند',
 ];
 
-const persianWeekdays = ['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ج'];
+const FA_DIGITS = '۰۱۲۳۴۵۶۷۸۹';
 
 function mod(a, b) {
     return ((a % b) + b) % b;
@@ -71,7 +71,7 @@ function d2g(jdn) {
     return { gy, gm, gd };
 }
 
-function j2d(jy, jm, jd) {
+export function j2d(jy, jm, jd) {
     const r = jalCal(jy);
 
     return g2d(r.gy, 3, r.march) + (jm - 1) * 31 - div(jm, 7) * (jm - 7) + jd - 1;
@@ -109,7 +109,7 @@ function d2j(jdn) {
     return { jy, jm, jd };
 }
 
-function jalaaliMonthLength(jy, jm) {
+export function jalaaliMonthLength(jy, jm) {
     if (jm <= 6) {
         return 31;
     }
@@ -120,7 +120,7 @@ function jalaaliMonthLength(jy, jm) {
     return g2d(jalCal(jy).gy + 1, 3, jalCal(jy).march) - g2d(jalCal(jy).gy, 3, jalCal(jy).march) - 336;
 }
 
-function parseJalali(value) {
+export function parseJalali(value) {
     const match = String(value || '').match(/^(\d{4})\/(\d{2})\/(\d{2})$/);
     if (!match) {
         return null;
@@ -133,111 +133,63 @@ function parseJalali(value) {
     };
 }
 
-function pad(value) {
+export function pad(value) {
     return String(value).padStart(2, '0');
 }
 
-function formatJalali(year, month, day) {
+export function formatJalali(year, month, day) {
     return `${year}/${pad(month)}/${pad(day)}`;
 }
 
-function todayJalali() {
+export function todayJalali() {
     const now = new Date();
 
     return d2j(g2d(now.getFullYear(), now.getMonth() + 1, now.getDate()));
 }
 
-function weekdayOf(jy, jm, jd) {
-    return mod(j2d(jy, jm, jd) + 1, 7);
+export function toFaDigits(value) {
+    return String(value).replace(/\d/g, (d) => FA_DIGITS[Number(d)]);
 }
 
-export function jalaliDatePicker(initialValue = '') {
-    const parsed = parseJalali(initialValue);
+export function toEnDigits(value) {
+    return String(value).replace(/[۰-۹]/g, (d) => String(FA_DIGITS.indexOf(d)));
+}
+
+export function getAgeInYears(jy, jm, jd) {
+    const today = todayJalali();
+    let age = today.jy - jy;
+    if (today.jm < jm || (today.jm === jm && today.jd < jd)) {
+        age -= 1;
+    }
+
+    return age;
+}
+
+export function isValidBirthDate(jy, jm, jd, minAge = 18, maxAge = 120) {
+    if (jm < 1 || jm > 12 || jd < 1 || jd > jalaaliMonthLength(jy, jm)) {
+        return false;
+    }
+
+    const age = getAgeInYears(jy, jm, jd);
+
+    return age >= minAge && age <= maxAge;
+}
+
+export function getBirthYearBounds(minAge = 18, maxAge = 120) {
     const today = todayJalali();
 
     return {
-        open: false,
-        year: parsed?.year ?? today.jy - 20,
-        month: parsed?.month ?? 1,
-        day: parsed?.day ?? 1,
-        selectedYear: parsed?.year ?? null,
-        selectedMonth: parsed?.month ?? null,
-        selectedDay: parsed?.day ?? null,
-
-        get formatted() {
-            if (!this.selectedYear || !this.selectedMonth || !this.selectedDay) {
-                return '';
-            }
-
-            return formatJalali(this.selectedYear, this.selectedMonth, this.selectedDay);
-        },
-
-        get display() {
-            if (!this.formatted) {
-                return '';
-            }
-
-            return `${this.selectedDay} ${persianMonths[this.selectedMonth - 1]} ${this.selectedYear}`;
-        },
-
-        get monthLabel() {
-            return `${persianMonths[this.month - 1]} ${this.year}`;
-        },
-
-        get weekdays() {
-            return persianWeekdays;
-        },
-
-        get days() {
-            const length = jalaaliMonthLength(this.year, this.month);
-            const firstWeekday = weekdayOf(this.year, this.month, 1);
-            const cells = [];
-
-            for (let i = 0; i < firstWeekday; i += 1) {
-                cells.push({ empty: true, key: `e-${i}` });
-            }
-
-            for (let d = 1; d <= length; d += 1) {
-                cells.push({
-                    empty: false,
-                    day: d,
-                    key: `d-${d}`,
-                    selected: this.selectedYear === this.year
-                        && this.selectedMonth === this.month
-                        && this.selectedDay === d,
-                });
-            }
-
-            return cells;
-        },
-
-        prevMonth() {
-            if (this.month === 1) {
-                this.month = 12;
-                this.year -= 1;
-                return;
-            }
-            this.month -= 1;
-        },
-
-        nextMonth() {
-            if (this.month === 12) {
-                this.month = 1;
-                this.year += 1;
-                return;
-            }
-            this.month += 1;
-        },
-
-        selectDay(day) {
-            this.selectedYear = this.year;
-            this.selectedMonth = this.month;
-            this.selectedDay = day;
-            this.open = false;
-        },
-
-        toggle() {
-            this.open = !this.open;
-        },
+        minYear: today.jy - maxAge,
+        maxYear: today.jy - minAge,
+        defaultYear: today.jy - 30,
     };
+}
+
+export function getDecades(minYear, maxYear) {
+    const decades = new Set();
+    for (let y = minYear; y <= maxYear; y += 1) {
+        decades.add(Math.floor(y / 10) * 10);
+    }
+
+    return [...decades].sort((a, b) => b - a);
 }

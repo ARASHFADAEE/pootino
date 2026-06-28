@@ -1,5 +1,6 @@
 @import 'tailwindcss';
 @import 'tom-select/dist/css/tom-select.css';
+@import './jalali-datepicker.css';
 
 @font-face {
   font-family: 'IRANYekanXVF';
@@ -26,6 +27,10 @@
 body {
   direction: rtl;
   background: var(--color-bg-soft);
+}
+
+[x-cloak] {
+  display: none !important;
 }
 
 .ts-wrapper.single .ts-control,

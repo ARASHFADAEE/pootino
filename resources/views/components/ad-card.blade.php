@@ -3,18 +3,7 @@
     <div class="mb-3 flex items-center justify-between text-xs text-slate-500">
         <span class="rounded-full bg-green-50 px-2 py-1 text-green-700">فعال</span>
         @if($ad->approved_at)
-            @php
-                $diffDays = (int) $ad->approved_at->diffInDays(now());
-                $dateLabel = match(true) {
-                    $diffDays === 0  => 'امروز',
-                    $diffDays === 1  => 'دیروز',
-                    $diffDays === 2  => '۲ روز پیش',
-                    $diffDays <= 6   => fa_num($diffDays) . ' روز پیش',
-                    $diffDays <= 29  => fa_num((int) ceil($diffDays / 7)) . ' هفته پیش',
-                    default          => \Morilog\Jalali\Jalalian::fromCarbon($ad->approved_at)->format('j F'),
-                };
-            @endphp
-            <span class="text-xs text-gray-400">{{ $dateLabel }}</span>
+            <span class="text-xs text-gray-400">{{ fa_time_ago($ad->approved_at) }}</span>
         @else
             <span class="text-xs text-gray-400">-</span>
         @endif
@@ -23,9 +12,9 @@
     <h3 class="mb-2 line-clamp-2 text-sm font-bold leading-6 text-slate-900">{{ $ad->title }}</h3>
 
     <div class="space-y-1 text-xs text-slate-600">
-        <p>محل فعلی: <strong>{{ $ad->currentProvince->name ?? '-' }}</strong></p>
-        <p>مقصد: <strong>{{ $ad->desiredProvince->name ?? '-' }}</strong></p>
-        <p>درجه: <strong>{{ $ad->rank->name ?? '-' }}</strong></p>
+        <p>محل خدمت فعلی: <strong>{{ $ad->currentProvince->name ?? '-' }}</strong></p>
+        <p>محل درخواستی: <strong>{{ $ad->desiredProvince->name ?? '-' }}</strong></p>
+        <p>درجه: <strong>{{ $ad->rank?->name ?? '-' }}</strong></p>
     </div>
 
     <div class="relative z-10 mt-4 flex items-center justify-between border-t border-slate-100 pt-3 text-xs">

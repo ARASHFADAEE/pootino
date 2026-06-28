@@ -9,13 +9,12 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('ads', function (Blueprint $table) {
-            $table->dropForeign(['current_branch_id']);
-        });
+        if (! Schema::hasColumn('military_branches', 'organization_id')) {
+            return;
+        }
 
-        Schema::table('military_branches', function (Blueprint $table) {
-            $table->dropForeign(['organization_id']);
-        });
+        $this->dropForeignKeyIfExists('ads', 'current_branch_id');
+        $this->dropForeignKeyIfExists('military_branches', 'organization_id');
 
         Schema::dropIfExists('military_organizations');
         Schema::dropIfExists('military_branches');
@@ -45,9 +44,11 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::table('ads', function (Blueprint $table) {
-            $table->dropForeign(['current_branch_id']);
-        });
+        if (Schema::hasColumn('military_branches', 'organization_id')) {
+            return;
+        }
+
+        $this->dropForeignKeyIfExists('ads', 'current_branch_id');
 
         Schema::dropIfExists('military_branches');
 
@@ -67,5 +68,26 @@ return new class extends Migration
         Schema::table('ads', function (Blueprint $table) {
             $table->foreign('current_branch_id')->references('id')->on('military_branches');
         });
+    }
+
+    private function dropForeignKeyIfExists(string $table, string $column): void
+    {
+        $database = Schema::getConnection()->getDatabaseName();
+
+        $constraints = DB::select(
+            'SELECT CONSTRAINT_NAME
+             FROM information_schema.KEY_COLUMN_USAGE
+             WHERE TABLE_SCHEMA = ?
+               AND TABLE_NAME = ?
+               AND COLUMN_NAME = ?
+               AND REFERENCED_TABLE_NAME IS NOT NULL',
+            [$database, $table, $column]
+        );
+
+        foreach ($constraints as $constraint) {
+            Schema::table($table, function (Blueprint $table) use ($constraint) {
+                $table->dropForeign($constraint->CONSTRAINT_NAME);
+            });
+        }
     }
 };

@@ -6,10 +6,8 @@ use App\Http\Requests\StoreAdRequest;
 use App\Http\Requests\UpdateAdRequest;
 use App\Jobs\SendAdToTelegramJob;
 use App\Models\Ad;
-use App\Models\EducationLevel;
 use App\Models\MilitaryBranch;
 use App\Models\Province;
-use App\Models\Rank;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -20,7 +18,7 @@ class AdController extends Controller
     public function index(Request $request)
     {
         $filters = $request->only([
-            'current_province_id', 'desired_province_id', 'rank_id', 'education_level_id', 'search',
+            'current_province_id', 'desired_province_id', 'branch_type', 'search',
         ]);
 
         try {
@@ -31,8 +29,7 @@ class AdController extends Controller
                 ])
                 ->when($filters['current_province_id'] ?? null, fn ($q, $v) => $q->where('current_province_id', $v))
                 ->when($filters['desired_province_id'] ?? null, fn ($q, $v) => $q->where('desired_province_id', $v))
-                ->when($filters['rank_id'] ?? null, fn ($q, $v) => $q->where('rank_id', $v))
-                ->when($filters['education_level_id'] ?? null, fn ($q, $v) => $q->where('education_level_id', $v))
+                ->when($filters['branch_type'] ?? null, fn ($q, $v) => $q->whereHas('currentBranch', fn ($bq) => $bq->where('type', $v)))
                 ->when($filters['search'] ?? null, function ($q, $search) {
                     $q->where(fn ($sub) => $sub->where('title', 'like', "%{$search}%")->orWhere('description', 'like', "%{$search}%"));
                 })
@@ -47,20 +44,14 @@ class AdController extends Controller
 
         try {
             $provinces = Province::query()->get();
-            $ranks = Rank::query()->get();
-            $educationLevels = EducationLevel::query()->get();
         } catch (QueryException) {
             $provinces = collect();
-            $ranks = collect();
-            $educationLevels = collect();
         }
 
         return view('ads.index', [
             'ads' => $ads,
             'filters' => $filters,
             'provinces' => $provinces,
-            'ranks' => $ranks,
-            'educationLevels' => $educationLevels,
             'totalActive' => $totalActive,
         ]);
     }
@@ -159,8 +150,6 @@ class AdController extends Controller
     {
         return [
             'provinces' => Province::orderBy('name')->get(),
-            'ranks' => Rank::orderBy('order')->get(),
-            'educationLevels' => EducationLevel::orderBy('order')->get(),
         ];
     }
 

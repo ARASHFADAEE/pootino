@@ -9,7 +9,7 @@ return new class extends Migration {
     {
         Schema::create('military_branches', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('organization_id')->constrained('military_organizations')->cascadeOnDelete();
+            $table->enum('type', ['army', 'sepah', 'police']);
             $table->string('name');
             $table->timestamps();
         });

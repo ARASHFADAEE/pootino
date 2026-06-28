@@ -1,0 +1,427 @@
+/* ── Jalali Date Picker — Premium UX ── */
+
+.jdp-trigger {
+    display: flex;
+    min-height: 3rem;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 0.75rem;
+    border: 1px solid #cbd5e1;
+    background: #fff;
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.jdp-trigger:hover {
+    border-color: #94a3b8;
+}
+
+.jdp-trigger:focus-visible {
+    outline: none;
+    border-color: var(--color-primary-700);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary-700) 20%, transparent);
+}
+
+.jdp-trigger--error {
+    border-color: #f87171;
+}
+
+.jdp-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    background: rgb(15 23 42 / 0.45);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+.jdp-panel {
+    --jdp-bg: #ffffff;
+    --jdp-surface: #f8fafc;
+    --jdp-border: #e2e8f0;
+    --jdp-text: #0f172a;
+    --jdp-muted: #64748b;
+    --jdp-accent: var(--color-primary-700);
+    --jdp-accent-soft: color-mix(in srgb, var(--color-primary-700) 12%, transparent);
+    --jdp-shadow: 0 25px 50px -12px rgb(15 23 42 / 0.25);
+
+    position: fixed;
+    z-index: 70;
+    display: flex;
+    max-height: min(92dvh, 640px);
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid var(--jdp-border);
+    background: var(--jdp-bg);
+    color: var(--jdp-text);
+    box-shadow: var(--jdp-shadow);
+    outline: none;
+}
+
+.jdp-panel--mobile {
+    inset-inline: 0;
+    bottom: 0;
+    border-radius: 1.5rem 1.5rem 0 0;
+    animation: jdp-slide-up 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.jdp-panel--desktop {
+    top: 50%;
+    left: 50%;
+    width: min(100% - 2rem, 26rem);
+    transform: translate(-50%, -50%);
+    border-radius: 1.25rem;
+    animation: jdp-scale-in 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes jdp-slide-up {
+    from {
+        transform: translateY(100%);
+        opacity: 0.6;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes jdp-scale-in {
+    from {
+        transform: translate(-50%, -48%) scale(0.96);
+        opacity: 0;
+    }
+    to {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+}
+
+.jdp-handle {
+    margin: 0.625rem auto 0;
+    height: 0.3rem;
+    width: 2.5rem;
+    flex-shrink: 0;
+    border-radius: 999px;
+    background: #cbd5e1;
+}
+
+.jdp-header {
+    flex-shrink: 0;
+    padding: 1rem 1.25rem 0.75rem;
+    border-bottom: 1px solid var(--jdp-border);
+}
+
+.jdp-header__title {
+    font-size: 1rem;
+    font-weight: 800;
+    line-height: 1.5;
+}
+
+.jdp-header__subtitle {
+    margin-top: 0.125rem;
+    font-size: 0.75rem;
+    color: var(--jdp-muted);
+}
+
+.jdp-steps {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+}
+
+.jdp-step {
+    flex: 1;
+    height: 0.25rem;
+    border-radius: 999px;
+    background: #e2e8f0;
+    transition: background 0.25s ease, transform 0.25s ease;
+}
+
+.jdp-step--active,
+.jdp-step--done {
+    background: var(--jdp-accent);
+}
+
+.jdp-step--active {
+    transform: scaleY(1.4);
+}
+
+.jdp-body {
+    flex: 1;
+    overflow: hidden;
+    padding: 1rem 1.25rem 1.25rem;
+}
+
+.jdp-decades {
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+    padding-bottom: 0.75rem;
+    margin-bottom: 0.75rem;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.jdp-decades::-webkit-scrollbar {
+    display: none;
+}
+
+.jdp-decade {
+    flex-shrink: 0;
+    min-height: 2.75rem;
+    min-width: 4.5rem;
+    padding: 0 0.875rem;
+    border-radius: 999px;
+    border: 1px solid var(--jdp-border);
+    background: var(--jdp-surface);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--jdp-text);
+    transition: all 0.2s ease;
+}
+
+.jdp-decade:hover {
+    border-color: var(--jdp-accent);
+    background: var(--jdp-accent-soft);
+}
+
+.jdp-decade:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--jdp-accent-soft);
+}
+
+.jdp-year-input-wrap {
+    margin-bottom: 0.75rem;
+}
+
+.jdp-year-input {
+    width: 100%;
+    min-height: 3rem;
+    border-radius: 0.875rem;
+    border: 1px solid var(--jdp-border);
+    background: var(--jdp-surface);
+    padding: 0 1rem;
+    text-align: center;
+    font-size: 1.125rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    color: var(--jdp-text);
+    direction: ltr;
+}
+
+.jdp-year-input:focus {
+    outline: none;
+    border-color: var(--jdp-accent);
+    box-shadow: 0 0 0 3px var(--jdp-accent-soft);
+}
+
+.jdp-year-input::placeholder {
+    letter-spacing: normal;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--jdp-muted);
+}
+
+.jdp-year-list {
+    position: relative;
+    height: 18rem;
+    overflow-y: auto;
+    overflow-x: hidden;
+    border-radius: 1rem;
+    border: 1px solid var(--jdp-border);
+    background: var(--jdp-surface);
+    scroll-snap-type: y proximity;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+}
+
+.jdp-year-list__inner {
+    position: relative;
+}
+
+.jdp-year-item {
+    position: absolute;
+    inset-inline: 0;
+    display: flex;
+    min-height: 3rem;
+    align-items: center;
+    justify-content: center;
+    scroll-snap-align: center;
+    border: none;
+    background: transparent;
+    font-size: 1.0625rem;
+    font-weight: 600;
+    color: var(--jdp-text);
+    transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+}
+
+.jdp-year-item:hover {
+    background: var(--jdp-accent-soft);
+}
+
+.jdp-year-item--focused {
+    background: var(--jdp-accent-soft);
+    color: var(--jdp-accent);
+    transform: scale(1.02);
+}
+
+.jdp-year-item:focus-visible {
+    outline: none;
+    box-shadow: inset 0 0 0 2px var(--jdp-accent);
+}
+
+.jdp-month-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.625rem;
+}
+
+.jdp-month {
+    display: flex;
+    min-height: 3.25rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 1rem;
+    border: 1px solid var(--jdp-border);
+    background: var(--jdp-bg);
+    padding: 0.75rem 0.5rem;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    line-height: 1.35;
+    color: var(--jdp-text);
+    transition: all 0.2s ease;
+}
+
+.jdp-month:hover {
+    border-color: var(--jdp-accent);
+    background: var(--jdp-accent-soft);
+    transform: translateY(-1px);
+}
+
+.jdp-month:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--jdp-accent-soft);
+}
+
+.jdp-day-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 0.5rem;
+}
+
+.jdp-day {
+    display: flex;
+    aspect-ratio: 1;
+    min-height: 2.75rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    background: transparent;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--jdp-text);
+    transition: all 0.18s ease;
+}
+
+.jdp-day:hover:not(:disabled) {
+    border-color: var(--jdp-border);
+    background: var(--jdp-surface);
+    transform: scale(1.06);
+}
+
+.jdp-day--selected {
+    border-color: var(--jdp-accent);
+    background: var(--jdp-accent);
+    color: #fff;
+    transform: scale(1.08);
+    box-shadow: 0 8px 20px color-mix(in srgb, var(--jdp-accent) 35%, transparent);
+}
+
+.jdp-day--focused:not(.jdp-day--selected) {
+    border-color: var(--jdp-accent);
+    background: var(--jdp-accent-soft);
+}
+
+.jdp-day:disabled {
+    cursor: not-allowed;
+    opacity: 0.28;
+}
+
+.jdp-day:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--jdp-accent-soft);
+}
+
+.jdp-back {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    gap: 0.375rem;
+    margin-bottom: 0.875rem;
+    border: none;
+    background: transparent;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--jdp-muted);
+    transition: color 0.15s ease;
+}
+
+.jdp-back:hover {
+    color: var(--jdp-accent);
+}
+
+.jdp-error {
+    margin-top: 0.75rem;
+    border-radius: 0.75rem;
+    border: 1px solid #fecaca;
+    background: #fef2f2;
+    padding: 0.625rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #b91c1c;
+}
+
+.jdp-context {
+    margin-bottom: 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--jdp-text);
+}
+
+body.jdp-open {
+    overflow: hidden;
+}
+
+@media (prefers-color-scheme: dark) {
+    .jdp-trigger {
+        border-color: #334155;
+        background: #1e293b;
+        color: #f1f5f9;
+    }
+
+    .jdp-panel {
+        --jdp-bg: #0f172a;
+        --jdp-surface: #1e293b;
+        --jdp-border: #334155;
+        --jdp-text: #f8fafc;
+        --jdp-muted: #94a3b8;
+        --jdp-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.55);
+    }
+
+    .jdp-handle {
+        background: #475569;
+    }
+
+    .jdp-step {
+        background: #334155;
+    }
+
+    .jdp-error {
+        border-color: #7f1d1d;
+        background: #450a0a;
+        color: #fecaca;
+    }
+}
