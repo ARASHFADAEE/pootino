@@ -10,7 +10,7 @@ class AdminAccess
 {
     public function handle(Request $request, Closure $next): Response
     {
-        $phones = collect(explode(',', (string) env('ADMIN_PHONES', '')))
+        $phones = collect(explode(',', (string) config('services.admin.phones', '')))
             ->map(fn ($phone) => trim($phone))
             ->filter()
             ->values();

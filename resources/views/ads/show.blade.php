@@ -10,7 +10,6 @@
         <div class="mt-5 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
             <div class="rounded-xl bg-slate-50 p-3">محل خدمت فعلی: {{ $ad->currentProvince->name }}</div>
             <div class="rounded-xl bg-slate-50 p-3">محل درخواستی: {{ $ad->desiredProvince->name }}</div>
-            <div class="rounded-xl bg-slate-50 p-3">درجه: {{ $ad->rank?->name ?? '-' }}</div>
             @if($ad->currentBranch)
                 <div class="rounded-xl bg-slate-50 p-3">ارگان: {{ $ad->currentBranch->typeLabel() }}</div>
             @endif

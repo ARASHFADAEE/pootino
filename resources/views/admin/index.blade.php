@@ -33,6 +33,20 @@
             </thead>
             <tbody>
                 @forelse($ads as $ad)
+                    @php
+                        $statusLabel = match($ad->status) {
+                            'pending' => 'در انتظار تایید',
+                            'approved' => 'تایید شده',
+                            'rejected' => 'رد شده',
+                            default => $ad->status,
+                        };
+                        $statusClass = match($ad->status) {
+                            'pending' => 'bg-amber-100 text-amber-800',
+                            'approved' => 'bg-green-100 text-green-800',
+                            'rejected' => 'bg-rose-100 text-rose-800',
+                            default => 'bg-slate-100 text-slate-700',
+                        };
+                    @endphp
                     <tr class="border-t border-slate-100 align-top">
                         <td class="px-3 py-3 font-semibold text-slate-900">{{ $ad->title }}</td>
                         <td class="px-3 py-3 text-slate-600">
@@ -41,7 +55,7 @@
                         </td>
                         <td class="px-3 py-3 text-slate-600">{{ $ad->currentProvince->name ?? '-' }} → {{ $ad->desiredProvince->name ?? '-' }}</td>
                         <td class="px-3 py-3">
-                            <span class="rounded-full bg-slate-100 px-2 py-1 text-xs text-slate-700">{{ $ad->status }}</span>
+                            <span class="rounded-full px-2 py-1 text-xs font-medium {{ $statusClass }}">{{ $statusLabel }}</span>
                         </td>
                         <td class="px-3 py-3">
                             @if($ad->reports_count > 0)
@@ -52,22 +66,32 @@
                         </td>
                         <td class="px-3 py-3">
                             <div class="flex flex-wrap items-center gap-2">
-                                <a href="{{ route('ads.show', $ad) }}" class="rounded-lg border border-slate-300 px-3 py-1.5 text-xs">نمایش</a>
-                                <form method="POST" action="{{ route('admin.ads.approve', $ad) }}">
-                                    @csrf
-                                    <button class="rounded-lg bg-green-700 px-3 py-1.5 text-xs text-white">تایید</button>
-                                </form>
-                                <form method="POST" action="{{ route('admin.ads.reject', $ad) }}" class="flex items-center gap-2">
-                                    @csrf
-                                    <input name="admin_note" class="rounded-lg border border-slate-300 px-2 py-1 text-xs" placeholder="دلیل رد (اختیاری)" />
-                                    <button class="rounded-lg bg-rose-700 px-3 py-1.5 text-xs text-white">رد</button>
-                                </form>
+                                <a href="{{ route('ads.show', $ad) }}" class="rounded-lg border border-slate-300 px-3 py-1.5 text-xs">پیش‌نمایش</a>
+                                @if($ad->status === 'pending')
+                                    <form method="POST" action="{{ route('admin.ads.approve', $ad) }}">
+                                        @csrf
+                                        <button type="submit" class="rounded-lg bg-green-700 px-3 py-1.5 text-xs text-white">تایید</button>
+                                    </form>
+                                    <form method="POST" action="{{ route('admin.ads.reject', $ad) }}" class="flex items-center gap-2">
+                                        @csrf
+                                        <input name="admin_note" class="rounded-lg border border-slate-300 px-2 py-1 text-xs" placeholder="دلیل رد (اختیاری)" />
+                                        <button type="submit" class="rounded-lg bg-rose-700 px-3 py-1.5 text-xs text-white">رد</button>
+                                    </form>
+                                @else
+                                    <span class="text-xs text-slate-400">بررسی شده</span>
+                                @endif
                             </div>
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="px-3 py-6 text-center text-slate-500">آگهی‌ای پیدا نشد.</td>
+                        <td colspan="6" class="px-3 py-8 text-center text-slate-500">
+                            @if($status === 'pending')
+                                آگهی در انتظار تاییدی وجود ندارد.
+                            @else
+                                آگهی‌ای پیدا نشد.
+                            @endif
+                        </td>
                     </tr>
                 @endforelse
             </tbody>

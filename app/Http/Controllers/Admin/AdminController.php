@@ -12,12 +12,14 @@ class AdminController extends Controller
 {
     public function index(Request $request)
     {
-        $status = $request->string('status')->toString();
+        $status = $request->has('status')
+            ? $request->string('status')->toString()
+            : 'pending';
 
         $ads = Ad::query()
             ->with(['user', 'currentProvince', 'desiredProvince'])
             ->withCount('reports')
-            ->when($status, fn ($q) => $q->where('status', $status))
+            ->when($status !== '', fn ($q) => $q->where('status', $status))
             ->latest()
             ->paginate(20)
             ->withQueryString();
@@ -37,24 +39,42 @@ class AdminController extends Controller
 
     public function approve(Ad $ad): RedirectResponse
     {
+        if ($ad->status !== 'pending') {
+            return redirect()
+                ->route('admin.index', ['status' => 'pending'])
+                ->with('error', 'این آگهی قبلاً بررسی شده است.');
+        }
+
         $ad->update([
             'status' => 'approved',
             'is_active' => true,
             'approved_at' => now(),
+            'expires_at' => now()->addDays(30),
             'admin_note' => null,
+            'edited_after_approval' => false,
         ]);
 
-        return back()->with('success', 'آگهی تایید شد.');
+        return redirect()
+            ->route('admin.index', ['status' => 'pending'])
+            ->with('success', 'آگهی تایید شد و در لیست عمومی نمایش داده می‌شود.');
     }
 
     public function reject(Request $request, Ad $ad): RedirectResponse
     {
+        if ($ad->status !== 'pending') {
+            return redirect()
+                ->route('admin.index', ['status' => 'pending'])
+                ->with('error', 'این آگهی قبلاً بررسی شده است.');
+        }
+
         $ad->update([
             'status' => 'rejected',
             'is_active' => false,
             'admin_note' => $request->string('admin_note')->toString() ?: 'رد توسط مدیر',
         ]);
 
-        return back()->with('success', 'آگهی رد شد.');
+        return redirect()
+            ->route('admin.index', ['status' => 'pending'])
+            ->with('success', 'آگهی رد شد.');
     }
 }

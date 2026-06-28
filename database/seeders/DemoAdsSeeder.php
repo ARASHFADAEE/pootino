@@ -4,10 +4,8 @@ namespace Database\Seeders;
 
 use App\Models\Ad;
 use App\Models\City;
-use App\Models\EducationLevel;
 use App\Models\MilitaryBranch;
 use App\Models\Province;
-use App\Models\Rank;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -26,14 +24,13 @@ class DemoAdsSeeder extends Seeder
         ])->map(fn ($u) => User::firstOrCreate(['phone' => $u['phone']], $u));
 
         $cities = City::inRandomOrder()->limit(20)->get();
-        $ranks = Rank::query()->get();
-        $educationLevels = EducationLevel::query()->get();
         $branchTypes = ['army', 'sepah', 'police'];
-        $unitNames = ['یگان ۶۵ نوهد', 'پادگان ۰۲ تهران', 'گردان ۱۲ مشهد', 'پایگاه شهید بابایی', 'یگان ویژه'];
 
-        if ($cities->count() < 2 || $ranks->isEmpty() || $educationLevels->isEmpty()) {
+        if ($cities->count() < 2) {
             return;
         }
+
+        $this->call(MilitaryBranchSeeder::class);
 
         $titles = [
             'تبادل از تهران به شیراز',
@@ -54,25 +51,21 @@ class DemoAdsSeeder extends Seeder
             $from = $cities->random();
             $to = $cities->where('id', '!=', $from->id)->random();
             $user = $users[$i % $users->count()];
-            $unitName = $unitNames[$i % count($unitNames)];
-
-            $branch = MilitaryBranch::create([
-                'type' => $branchTypes[$i % count($branchTypes)],
-                'name' => $unitName,
-            ]);
+            $branchType = $branchTypes[$i % count($branchTypes)];
+            $branch = MilitaryBranch::where('type', $branchType)->first()
+                ?? MilitaryBranch::create(['type' => $branchType, 'name' => $branchType]);
 
             Ad::create([
                 'user_id' => $user->id,
                 'title' => $title,
                 'description' => 'آگهی دمو برای تست تجربه کاربری نسخه موبایل و دسکتاپ.',
                 'current_province_id' => $from->province_id,
-                'current_city_id' => $from->id,
+                'current_city_id' => null,
                 'current_branch_id' => $branch->id,
-                'unit_name' => $unitName,
                 'desired_province_id' => $to->province_id,
-                'desired_city_id' => $to->id,
-                'rank_id' => $ranks->random()->id,
-                'education_level_id' => $educationLevels->random()->id,
+                'desired_city_id' => null,
+                'rank_id' => null,
+                'education_level_id' => null,
                 'phone' => $user->phone,
                 'status' => 'approved',
                 'approved_at' => now()->subDays(rand(0, 20)),

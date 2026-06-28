@@ -18,7 +18,10 @@ class Ad extends Model
 
     public function scopeApproved($query)
     {
-        return $query->where('status', 'approved')->where('is_active', true);
+        return $query
+            ->where('status', 'approved')
+            ->where('is_active', true)
+            ->where(fn ($q) => $q->whereNull('expires_at')->orWhere('expires_at', '>', now()));
     }
 
     public function user() { return $this->belongsTo(User::class); }

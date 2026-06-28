@@ -14,7 +14,6 @@
     <div class="space-y-1 text-xs text-slate-600">
         <p>محل خدمت فعلی: <strong>{{ $ad->currentProvince->name ?? '-' }}</strong></p>
         <p>محل درخواستی: <strong>{{ $ad->desiredProvince->name ?? '-' }}</strong></p>
-        <p>درجه: <strong>{{ $ad->rank?->name ?? '-' }}</strong></p>
     </div>
 
     <div class="relative z-10 mt-4 flex items-center justify-between border-t border-slate-100 pt-3 text-xs">

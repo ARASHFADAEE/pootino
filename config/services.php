@@ -30,4 +30,15 @@ return [
         'timeout' => env('SHAHKAR_TIMEOUT', 20),
         'enforce_in_local' => env('SHAHKAR_ENFORCE_IN_LOCAL', false),
     ],
+    'admin' => [
+        'phones' => env('ADMIN_PHONES', ''),
+    ],
+    'ai_kar' => [
+        'url' => env('AI_KAR_URL', 'https://api.ai-kar.com/v1/chat/completions'),
+        'api_key' => env('AI_KAR_API_KEY'),
+        'model' => env('AI_KAR_MODEL', 'google/gemini-2.5-flash'),
+        'fallback_models' => array_filter(array_map('trim', explode(',', env('AI_KAR_FALLBACK_MODELS', 'gemini-2.5-flash,google/gemini-2.5-pro,gemini-2.5-pro')))),
+        'timeout' => env('AI_KAR_TIMEOUT', 30),
+        'auto_approve_in_local' => env('AI_KAR_AUTO_APPROVE_IN_LOCAL', false),
+    ],
 ];
