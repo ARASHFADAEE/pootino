@@ -20,7 +20,12 @@ class OtpController extends Controller
         protected ShahkarKycService $shahkar,
     ) {}
 
-    public function showPhoneForm() { return view('auth.phone'); }
+    public function showPhoneForm(Request $request)
+    {
+        $this->rememberRedirectTarget($request->query('redirect'));
+
+        return view('auth.phone');
+    }
     public function showVerifyForm() { return view('auth.verify'); }
     public function showCompleteProfileForm() { return view('auth.complete-profile'); }
     public function showVerificationRequired() { return view('auth.verification-required'); }
@@ -72,14 +77,20 @@ class OtpController extends Controller
             ['name' => 'کاربر']
         );
 
+        $savedRedirect = session('post_auth_redirect') ?? session('url.intended');
+
         Auth::login($user);
         session()->forget(['otp_phone', 'otp_preview_code']);
+
+        if ($savedRedirect) {
+            $this->rememberRedirectTarget($savedRedirect);
+        }
 
         if (! $user->national_code) {
             return redirect()->route('auth.otp.complete-profile-form')->with('success', 'برای تکمیل ثبت‌نام، اطلاعات هویتی را وارد کن.');
         }
 
-        return redirect()->route('ads.index')->with('success', 'خوش آمدید');
+        return $this->redirectAfterAuth()->with('success', 'خوش آمدید');
     }
 
     public function resendOtp(Request $request)
@@ -156,7 +167,7 @@ class OtpController extends Controller
 
         session(['otp_sehatsanji_shenase' => $kyc['shenase'] ?? null]);
 
-        return redirect()->intended(route('ads.index'))->with('success', 'ثبت‌نام شما تکمیل شد.');
+        return $this->redirectAfterAuth()->with('success', 'ثبت‌نام شما تکمیل شد.');
     }
 
     public function logout(Request $request)
@@ -166,6 +177,45 @@ class OtpController extends Controller
         $request->session()->regenerateToken();
 
         return redirect()->route('ads.index');
+    }
+
+    private function rememberRedirectTarget(mixed $redirect): void
+    {
+        $target = $this->resolveRedirectTarget(is_string($redirect) ? $redirect : null);
+
+        if ($target) {
+            session([
+                'post_auth_redirect' => $target,
+                'url.intended' => $target,
+            ]);
+        }
+    }
+
+    private function redirectAfterAuth()
+    {
+        $target = session()->pull('post_auth_redirect')
+            ?? session()->pull('url.intended')
+            ?? route('ads.index');
+
+        return redirect()->to($target);
+    }
+
+    private function resolveRedirectTarget(?string $redirect): ?string
+    {
+        if (! is_string($redirect) || $redirect === '') {
+            return null;
+        }
+
+        if (str_starts_with($redirect, '/') && ! str_starts_with($redirect, '//')) {
+            return $redirect;
+        }
+
+        $appUrl = rtrim((string) config('app.url'), '/');
+        if ($appUrl !== '' && str_starts_with($redirect, $appUrl)) {
+            return $redirect;
+        }
+
+        return null;
     }
 
     private function isValidIranianNationalCode(string $nationalCode): bool

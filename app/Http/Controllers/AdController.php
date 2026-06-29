@@ -42,6 +42,12 @@ class AdController extends Controller
             ]);
         }
 
+        if ($request->boolean('partial')) {
+            return response()->json([
+                'html' => view('ads.partials.results', compact('ads'))->render(),
+            ]);
+        }
+
         try {
             $provinces = Province::query()->get();
         } catch (QueryException) {

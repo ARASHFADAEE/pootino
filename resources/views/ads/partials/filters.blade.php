@@ -1,4 +1,5 @@
 <form method="GET" class="space-y-3 text-sm">
+    <input type="hidden" name="search" :value="search.trim()">
     <select name="current_province_id" data-searchable class="w-full rounded-xl border-slate-300">
         <option value="">الان کجا خدمت میکنی؟</option>
         @foreach($provinces as $p)

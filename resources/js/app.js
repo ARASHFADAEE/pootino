@@ -2,10 +2,12 @@ import Alpine from 'alpinejs';
 import TomSelect from 'tom-select';
 import { jalaliDatePicker } from './jalali/datepicker.js';
 import { infiniteAds } from './infinite-ads.js';
+import { liveListing } from './live-listing.js';
 
 window.Alpine = Alpine;
 Alpine.data('jalaliDatePicker', jalaliDatePicker);
 Alpine.data('infiniteAds', infiniteAds);
+Alpine.data('liveListing', liveListing);
 Alpine.start();
 
 const instances = new WeakMap();
