@@ -3,7 +3,21 @@
 if (! function_exists('fa_num')) {
     function fa_num(int $n): string
     {
-        return str_replace(range(0, 9), ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'], (string) $n);
+        return fa_digits((string) $n);
+    }
+}
+
+if (! function_exists('fa_digits')) {
+    function fa_digits(?string $value): string
+    {
+        return str_replace(range(0, 9), ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'], (string) $value);
+    }
+}
+
+if (! function_exists('en_digits')) {
+    function en_digits(?string $value): string
+    {
+        return str_replace(['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'], range(0, 9), (string) $value);
     }
 }
 

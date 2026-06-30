@@ -24,6 +24,5 @@
         <option value="police" @selected(($filters['branch_type'] ?? '') === 'police')>نیروی انتظامی</option>
     </select>
 
-    <button class="w-full rounded-xl bg-[var(--color-primary-700)] py-2.5 font-semibold text-white">اعمال فیلتر</button>
-    <a href="{{ route('ads.index') }}" class="block w-full rounded-xl border border-slate-300 py-2.5 text-center">پاک کردن</a>
+    <button class="w-full rounded-xl bg-[var(--color-primary-700)] py-2.5 font-semibold text-white">جستجو</button>
 </form>

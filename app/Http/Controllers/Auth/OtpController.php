@@ -22,7 +22,9 @@ class OtpController extends Controller
 
     public function showPhoneForm(Request $request)
     {
-        $this->rememberRedirectTarget($request->query('redirect'));
+        $this->rememberRedirectTarget(
+            $request->query('redirect') ?? session('url.intended')
+        );
 
         return view('auth.phone');
     }
@@ -32,6 +34,10 @@ class OtpController extends Controller
 
     public function sendOtp(Request $request)
     {
+        $this->rememberRedirectTarget(session('post_auth_redirect') ?? session('url.intended'));
+
+        $request->merge(['phone' => en_digits($request->input('phone'))]);
+
         $request->validate([
             'phone' => ['required', 'regex:/^09[0-9]{9}$/'],
         ]);
@@ -62,6 +68,8 @@ class OtpController extends Controller
 
     public function verifyOtp(Request $request)
     {
+        $request->merge(['code' => en_digits($request->input('code'))]);
+
         $request->validate(['code' => ['required', 'digits:6']]);
 
         $phone = session('otp_phone');
@@ -104,6 +112,11 @@ class OtpController extends Controller
 
     public function completeProfile(Request $request)
     {
+        $request->merge([
+            'national_code' => en_digits($request->input('national_code')),
+            'birth_date' => en_digits($request->input('birth_date')),
+        ]);
+
         $request->validate([
             'first_name' => ['required', 'string', 'max:50'],
             'family' => ['required', 'string', 'max:50'],
@@ -215,7 +228,23 @@ class OtpController extends Controller
             return $redirect;
         }
 
-        return null;
+        $parsed = parse_url($redirect);
+        $path = is_array($parsed) ? ($parsed['path'] ?? null) : null;
+        if (! is_string($path) || ! str_starts_with($path, '/')) {
+            return null;
+        }
+
+        $host = is_array($parsed) ? ($parsed['host'] ?? null) : null;
+        $appHost = parse_url($appUrl, PHP_URL_HOST);
+        if (is_string($host) && is_string($appHost) && $host !== $appHost) {
+            if (! preg_match('#^/(ads|my-ads|admin|auth)(/|$)#', $path) && $path !== '/') {
+                return null;
+            }
+        }
+
+        $query = is_array($parsed) ? ($parsed['query'] ?? null) : null;
+
+        return is_string($query) && $query !== '' ? $path.'?'.$query : $path;
     }
 
     private function isValidIranianNationalCode(string $nationalCode): bool

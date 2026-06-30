@@ -3,11 +3,15 @@ import TomSelect from 'tom-select';
 import { jalaliDatePicker } from './jalali/datepicker.js';
 import { infiniteAds } from './infinite-ads.js';
 import { liveListing } from './live-listing.js';
+import { persianNumericInput } from './persian-numeric.js';
+import { toFaDigits } from './jalali/calendar.js';
 
 window.Alpine = Alpine;
+window.toFaDigits = toFaDigits;
 Alpine.data('jalaliDatePicker', jalaliDatePicker);
 Alpine.data('infiniteAds', infiniteAds);
 Alpine.data('liveListing', liveListing);
+Alpine.data('persianNumericInput', persianNumericInput);
 Alpine.start();
 
 const instances = new WeakMap();

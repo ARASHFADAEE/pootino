@@ -24,7 +24,7 @@
             @auth
                 <p class="text-xs font-semibold text-slate-500">شماره تماس</p>
                 <div class="mt-3 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <p class="rounded-xl border border-slate-200 bg-white px-4 py-3 text-center text-2xl font-extrabold tracking-wider text-slate-900 sm:text-right" dir="ltr">{{ $ad->phone }}</p>
+                    <p class="rounded-xl border border-slate-200 bg-white px-4 py-3 text-center text-2xl font-extrabold tracking-wider text-slate-900 sm:text-right" dir="ltr">{{ fa_digits($ad->phone) }}</p>
                     <button
                         type="button"
                         class="rounded-xl bg-[var(--color-primary-700)] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[var(--color-primary-900)]"
@@ -37,7 +37,7 @@
             @else
                 <div class="rounded-xl border border-amber-200 bg-amber-50 p-4 text-center">
                     <p class="text-sm font-medium text-amber-900">برای دیدن شماره تماس وارد حساب کاربری شو.</p>
-                    <a href="{{ route('auth.otp.phone', ['redirect' => request()->url()]) }}" class="mt-3 inline-block rounded-xl bg-[var(--color-primary-700)] px-4 py-2 text-sm font-semibold text-white">ورود / ثبت‌نام</a>
+                    <a href="{{ route('auth.otp.phone', ['redirect' => request()->getRequestUri()]) }}" class="mt-3 inline-block rounded-xl bg-[var(--color-primary-700)] px-4 py-2 text-sm font-semibold text-white">ورود / ثبت‌نام</a>
                 </div>
             @endauth
         </div>
@@ -66,7 +66,7 @@
                 گزارش آگهی
             </button>
         @else
-            <a href="{{ route('auth.otp.phone', ['redirect' => request()->url()]) }}" class="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-600 transition hover:border-rose-300 hover:text-rose-700">
+            <a href="{{ route('auth.otp.phone', ['redirect' => request()->getRequestUri()]) }}" class="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-600 transition hover:border-rose-300 hover:text-rose-700">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6H8.5l-1 1H5a2 2 0 01-2-2zm9-13.5V9" />
                 </svg>

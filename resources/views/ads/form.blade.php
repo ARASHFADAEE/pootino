@@ -25,7 +25,7 @@
         </div>
         <div class="sm:col-span-2">
             <label class="mb-1 block text-sm font-semibold text-slate-700">شماره تماس</label>
-            <input class="w-full rounded-xl border border-slate-200 bg-slate-100 px-4 py-3 text-center text-sm text-slate-700" dir="ltr" name="phone" value="{{ old('phone', $ad->phone ?? auth()->user()->phone) }}" readonly />
+            <input class="w-full rounded-xl border border-slate-200 bg-slate-100 px-4 py-3 text-center text-sm text-slate-700" dir="ltr" name="phone" value="{{ fa_digits(old('phone', $ad->phone ?? auth()->user()->phone)) }}" readonly />
             <p class="mt-1 text-xs text-slate-500">شماره تماس از حساب کاربری خوانده می‌شود و قابل تغییر نیست.</p>
         </div>
         <div>

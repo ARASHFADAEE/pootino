@@ -135,10 +135,23 @@ export function jalaliDatePicker(initialValue = '', options = {}) {
             this.pendingYear = null;
             this.pendingMonth = null;
             this.yearInput = '';
+
+            if (this.selectedYear) {
+                this.yearFocusIndex = this.years.indexOf(this.selectedYear);
+            } else {
+                this.yearFocusIndex = this.years.indexOf(this.bounds.defaultYear);
+            }
+
+            if (this.yearFocusIndex < 0) {
+                this.yearFocusIndex = 0;
+            }
+
             document.body.classList.add('jdp-open');
 
             this.$nextTick(() => {
-                this.scrollToYearIndex(this.yearFocusIndex >= 0 ? this.yearFocusIndex : years.indexOf(bounds.defaultYear), false);
+                requestAnimationFrame(() => {
+                    this.scrollToYearIndex(this.yearFocusIndex, false);
+                });
                 this.$refs.panel?.focus();
             });
         },
@@ -170,6 +183,7 @@ export function jalaliDatePicker(initialValue = '', options = {}) {
 
             const top = Math.max(0, index * YEAR_ITEM_H - (YEAR_VIEWPORT_H / 2) + (YEAR_ITEM_H / 2));
             list.scrollTo({ top, behavior: smooth ? 'smooth' : 'auto' });
+            this.yearScrollTop = top;
             this.yearFocusIndex = index;
         },
 
@@ -209,8 +223,22 @@ export function jalaliDatePicker(initialValue = '', options = {}) {
             this.pendingMonth = null;
             this.validationError = '';
 
+            if (this.pendingYear) {
+                this.yearFocusIndex = this.years.indexOf(this.pendingYear);
+            } else if (this.selectedYear) {
+                this.yearFocusIndex = this.years.indexOf(this.selectedYear);
+            } else {
+                this.yearFocusIndex = this.years.indexOf(this.bounds.defaultYear);
+            }
+
+            if (this.yearFocusIndex < 0) {
+                this.yearFocusIndex = 0;
+            }
+
             this.$nextTick(() => {
-                this.scrollToYearIndex(this.yearFocusIndex >= 0 ? this.yearFocusIndex : 0, false);
+                requestAnimationFrame(() => {
+                    this.scrollToYearIndex(this.yearFocusIndex, false);
+                });
             });
         },
 

@@ -8,9 +8,18 @@
 
         <form method="POST" action="{{ route('auth.otp.send') }}" class="space-y-4">
             @csrf
-            <div>
+            <div x-data="persianNumericInput(@js(old('phone', '')), 11)">
                 <label class="mb-1 block text-sm">شماره موبایل</label>
-                <input dir="ltr" name="phone" value="{{ old('phone') }}" class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-center text-sm text-slate-900 placeholder:text-slate-400 focus:border-[var(--color-primary-700)] focus:ring-[var(--color-primary-700)]" placeholder="09123456789" />
+                <input
+                    type="text"
+                    inputmode="numeric"
+                    dir="ltr"
+                    x-model="display"
+                    @input="onInput()"
+                    class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-center text-sm text-slate-900 placeholder:text-slate-400 focus:border-[var(--color-primary-700)] focus:ring-[var(--color-primary-700)]"
+                    placeholder="۰۹۱۲۳۴۵۶۷۸۹"
+                />
+                <input type="hidden" name="phone" x-ref="hidden" :value="latin">
             </div>
             <button class="w-full rounded-xl bg-[var(--color-primary-700)] py-3 text-sm font-semibold text-white">ارسال کد تایید</button>
                     @if($errors->any())

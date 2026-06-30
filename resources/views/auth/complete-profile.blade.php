@@ -31,9 +31,19 @@
                 <input name="father_name" value="{{ old('father_name') }}" required class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[var(--color-primary-700)] focus:ring-[var(--color-primary-700)] @error('father_name') border-red-400 @enderror" placeholder="مثال: محمود" />
                 @error('father_name')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
             </div>
-            <div>
+            <div x-data="persianNumericInput(@js(old('national_code', '')), 10)">
                 <label class="mb-1 block text-sm font-medium text-slate-700">کد ملی <span class="text-red-500">*</span></label>
-                <input dir="ltr" name="national_code" maxlength="10" value="{{ old('national_code') }}" required class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-center text-sm text-slate-900 placeholder:text-slate-400 focus:border-[var(--color-primary-700)] focus:ring-[var(--color-primary-700)] @error('national_code') border-red-400 @enderror" placeholder="0012345678" />
+                <input
+                    type="text"
+                    inputmode="numeric"
+                    dir="ltr"
+                    x-model="display"
+                    @input="onInput()"
+                    required
+                    class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-center text-sm text-slate-900 placeholder:text-slate-400 focus:border-[var(--color-primary-700)] focus:ring-[var(--color-primary-700)] @error('national_code') border-red-400 @enderror"
+                    placeholder="۰۰۱۲۳۴۵۶۷۸"
+                />
+                <input type="hidden" name="national_code" x-ref="hidden" :value="latin">
                 @error('national_code')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
             </div>
 

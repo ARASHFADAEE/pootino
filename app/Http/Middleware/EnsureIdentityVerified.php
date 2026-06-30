@@ -20,6 +20,8 @@ class EnsureIdentityVerified
             return redirect()->guest(route('auth.otp.verification-required'));
         }
 
-        return redirect()->guest(route('auth.otp.phone'));
+        return redirect()->guest(route('auth.otp.phone', [
+            'redirect' => $request->getRequestUri(),
+        ]));
     }
 }
