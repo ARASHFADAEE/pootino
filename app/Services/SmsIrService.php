@@ -22,7 +22,7 @@ class SmsIrService
         ])->post('https://api.sms.ir/v1/send/verify', [
             'mobile' => $mobile,
             'templateId' => $templateId,
-            'parameters' => [['name' => 'CODE', 'value' => $code]],
+            'parameters' => [['name' => 'OTP', 'value' => $code]],
         ]);
 
         return $response->successful();
