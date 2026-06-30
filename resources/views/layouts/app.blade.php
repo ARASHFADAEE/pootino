@@ -113,7 +113,7 @@
                         <button class="rounded-lg border border-rose-200 px-3 py-2 text-sm text-rose-700 hover:bg-rose-50">خروج</button>
                     </form>
                 @else
-                    <a href="{{ route('auth.otp.phone') }}" class="rounded-lg bg-[var(--color-primary-700)] px-3 py-1.5 text-xs font-semibold text-white sm:px-4 sm:py-2 sm:text-sm">ورود / ثبت‌نام</a>
+                    <a href="{{ route('auth.otp.phone', ['redirect' => request()->getRequestUri()]) }}" class="rounded-lg bg-[var(--color-primary-700)] px-3 py-1.5 text-xs font-semibold text-white sm:px-4 sm:py-2 sm:text-sm">ورود / ثبت‌نام</a>
                 @endauth
                 @auth
                 <button
