@@ -58,6 +58,32 @@ class AdCrudTest extends TestCase
         $this->assertSame('army', $ad->currentBranch->type);
     }
 
+    public function test_store_accepts_persian_digits_in_phone_field(): void
+    {
+        $user = User::create([
+            'name' => 'کاربر تست',
+            'phone' => '09130000013',
+            'national_code' => '1273835743',
+        ]);
+
+        $current = Province::create(['name' => 'تهران']);
+        $desired = Province::create(['name' => 'فارس']);
+
+        $this->actingAs($user)->post(route('ads.store'), [
+            'title' => 'تبادل با شماره فارسی',
+            'description' => 'توضیح تست',
+            'current_province_id' => $current->id,
+            'desired_province_id' => $desired->id,
+            'branch_type' => 'army',
+            'phone' => '۰۹۱۳۰۰۰۰۰۱۳',
+        ])->assertRedirect(route('ads.my'));
+
+        $this->assertDatabaseHas('ads', [
+            'user_id' => $user->id,
+            'phone' => '09130000013',
+        ]);
+    }
+
     public function test_store_fails_with_validation_errors_when_required_fields_missing(): void
     {
         $user = User::create([

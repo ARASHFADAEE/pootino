@@ -11,6 +11,17 @@ class StoreAdRequest extends FormRequest
         return auth()->check();
     }
 
+    protected function prepareForValidation(): void
+    {
+        $phone = en_digits($this->input('phone'));
+
+        if ($phone === '' && $this->user()) {
+            $phone = $this->user()->phone;
+        }
+
+        $this->merge(['phone' => $phone]);
+    }
+
     public function rules(): array
     {
         return [

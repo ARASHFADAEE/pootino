@@ -108,7 +108,7 @@ class AdController extends Controller
         $user = $request->user();
         $validated = $request->validated();
 
-        $ad = $user->ads()->create($this->adAttributesFromValidated($validated));
+        $ad = $user->ads()->create($this->adAttributesFromValidated($validated, $user));
 
         ModerateAdJob::dispatchSync($ad);
         SendAdToTelegramJob::dispatch($ad);
@@ -135,7 +135,7 @@ class AdController extends Controller
         abort_if($ad->user_id !== Auth::id(), 403);
 
         $ad->update([
-            ...$this->adAttributesFromValidated($request->validated()),
+            ...$this->adAttributesFromValidated($request->validated(), $request->user()),
             'status' => 'pending',
             'approved_at' => null,
             'expires_at' => null,
@@ -194,7 +194,7 @@ class AdController extends Controller
         ];
     }
 
-    private function adAttributesFromValidated(array $validated): array
+    private function adAttributesFromValidated(array $validated, ?\App\Models\User $user = null): array
     {
         return [
             'title' => $validated['title'],
@@ -206,7 +206,7 @@ class AdController extends Controller
             'desired_city_id' => null,
             'rank_id' => null,
             'education_level_id' => null,
-            'phone' => $validated['phone'],
+            'phone' => $user?->phone ?? $validated['phone'],
         ];
     }
 

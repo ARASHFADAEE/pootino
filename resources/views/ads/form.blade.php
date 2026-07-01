@@ -24,9 +24,14 @@
             @error('title')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
         </div>
         <div class="sm:col-span-2">
+            @php
+                $contactPhone = en_digits(old('phone', $ad->phone ?? auth()->user()->phone));
+            @endphp
             <label class="mb-1 block text-sm font-semibold text-slate-700">شماره تماس</label>
-            <input class="w-full rounded-xl border border-slate-200 bg-slate-100 px-4 py-3 text-center text-sm text-slate-700" dir="ltr" name="phone" value="{{ fa_digits(old('phone', $ad->phone ?? auth()->user()->phone)) }}" readonly />
+            <div class="w-full rounded-xl border border-slate-200 bg-slate-100 px-4 py-3 text-center text-sm text-slate-700" dir="ltr">{{ fa_digits($contactPhone) }}</div>
+            <input type="hidden" name="phone" value="{{ $contactPhone }}">
             <p class="mt-1 text-xs text-slate-500">شماره تماس از حساب کاربری خوانده می‌شود و قابل تغییر نیست.</p>
+            @error('phone')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
         </div>
         <div>
             <label class="mb-1 block text-sm font-semibold text-slate-700">محل خدمت فعلی (استان) <span class="text-red-500">*</span></label>
