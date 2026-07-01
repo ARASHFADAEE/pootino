@@ -11,7 +11,7 @@ class MilitaryBranch extends Model
     public function typeLabel(): string
     {
         return match ($this->type) {
-            'army' => 'ارتش جمهوری اسلامی',
+            'army' => 'ارتش',
             'sepah' => 'سپاه پاسداران',
             'police' => 'نیروی انتظامی',
             default => $this->type ?: 'نامشخص',

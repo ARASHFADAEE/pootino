@@ -42,9 +42,22 @@ class StoreAdRequest extends FormRequest
             'current_province_id.exists' => 'استان محل خدمت معتبر نیست.',
             'desired_province_id.required' => 'محل درخواستی را انتخاب کنید.',
             'desired_province_id.exists' => 'استان محل درخواستی معتبر نیست.',
-            'branch_type.required' => 'ارگان را انتخاب کنید.',
+            'branch_type.required' => 'لطفاً ارگان خود را انتخاب کنید.',
             'branch_type.in' => 'ارگان انتخاب‌شده معتبر نیست.',
+            'phone.required' => 'شماره تماس الزامی است.',
             'phone.regex' => 'شماره تماس معتبر نیست.',
+        ];
+    }
+
+    public function attributes(): array
+    {
+        return [
+            'title' => 'عنوان آگهی',
+            'current_province_id' => 'محل خدمت فعلی',
+            'desired_province_id' => 'محل درخواستی',
+            'branch_type' => 'ارگان',
+            'phone' => 'شماره تماس',
+            'description' => 'توضیحات',
         ];
     }
 }

@@ -13,7 +13,7 @@
     </div>
 @endif
 
-<form method="POST" action="{{ $editing ? route('ads.update', $ad) : route('ads.store') }}" class="space-y-4">
+<form method="POST" action="{{ $editing ? route('ads.update', $ad) : route('ads.store') }}" class="space-y-4" novalidate>
     @csrf
     @if($editing) @method('PUT') @endif
 
@@ -53,7 +53,7 @@
             <label class="mb-1 block text-sm font-semibold text-slate-700">ارگان <span class="text-red-500">*</span></label>
             <select class="w-full rounded-xl border-slate-300 @error('branch_type') border-red-400 @enderror" name="branch_type" required>
                 <option value="">انتخاب ارگان</option>
-                <option value="army" @selected(old('branch_type', $editing ? ($ad->currentBranch->type ?? '') : '') === 'army')>ارتش جمهوری اسلامی</option>
+                <option value="army" @selected(old('branch_type', $editing ? ($ad->currentBranch->type ?? '') : '') === 'army')>ارتش</option>
                 <option value="sepah" @selected(old('branch_type', $editing ? ($ad->currentBranch->type ?? '') : '') === 'sepah')>سپاه پاسداران</option>
                 <option value="police" @selected(old('branch_type', $editing ? ($ad->currentBranch->type ?? '') : '') === 'police')>نیروی انتظامی</option>
             </select>

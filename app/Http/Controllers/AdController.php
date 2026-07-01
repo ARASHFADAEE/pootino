@@ -213,7 +213,7 @@ class AdController extends Controller
     private function resolveBranchId(string $type): int
     {
         $labels = [
-            'army' => 'ارتش جمهوری اسلامی ایران',
+            'army' => 'ارتش',
             'sepah' => 'سپاه پاسداران انقلاب اسلامی',
             'police' => 'نیروی انتظامی',
         ];

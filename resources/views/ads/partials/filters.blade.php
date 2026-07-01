@@ -19,7 +19,7 @@
     padding: 10px;
 ">
         <option value="">ارگان</option>
-        <option value="army" @selected(($filters['branch_type'] ?? '') === 'army')>ارتش جمهوری اسلامی</option>
+        <option value="army" @selected(($filters['branch_type'] ?? '') === 'army')>ارتش</option>
         <option value="sepah" @selected(($filters['branch_type'] ?? '') === 'sepah')>سپاه پاسداران</option>
         <option value="police" @selected(($filters['branch_type'] ?? '') === 'police')>نیروی انتظامی</option>
     </select>
